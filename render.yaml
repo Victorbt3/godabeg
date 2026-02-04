@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: godabeg
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: godabeg-db
+          property: connectionString
+      - key: PY_SERVICE_URL
+        value: https://godabeg-ml.onrender.com
+
+databases:
+  - name: godabeg-db
+    databaseName: godabeg
+    user: godabeg_user

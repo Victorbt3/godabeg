@@ -1,0 +1,11 @@
+.vercel
+node_modules
+.venv*
+python_ml_service/.venv*
+python_ml_service/__pycache__
+__pycache__
+*.pyc
+*.h5
+.env
+.DS_Store
+godabeg-deploy.zip

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scan Result</title>
+  <link rel="stylesheet" href="bobu.txt">
+</head>
+<body>
+  <div class="layout">
+    <div class="side">
+      <div>
+        <h2 class="side-title">Your History</h2>
+      </div>
+    </div>
+    <div class="main">
+      <div class="result-top">
+        <div class="emotion-card">
+          <div class="emoji" id="emoji">😐</div>
+          <div class="emotion-title" id="moodTitle">Result</div>
+        </div>
+        <div class="stats">
+          <div class="row"><span class="label">Confidence:</span><span class="value" id="confidence">—</span></div>
+          <div class="row"><span class="label">Happy:</span><span class="value" id="happy">—</span></div>
+          <div class="row"><span class="label">Neutral:</span><span class="value" id="neutral">—</span></div>
+          <div class="row"><span class="label">Surprise:</span><span class="value" id="surprise">—</span></div>
+          <div class="row"><span class="label">Scan time:</span><span class="value" id="scanTime">—</span></div>
+        </div>
+      </div>
+      <div class="advice">
+        <h3>Advice</h3>
+        <p id="adviceText">—</p>
+      </div>
+      <div class="actions">
+        <button class="btn btn-outline" onclick="scanAgain()">Scan Again</button>
+        <button class="btn btn-solid" onclick="done()">Done</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    function getParam(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name) || '';
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      const mood = getParam('emotion');
+      const confidence = getParam('confidence');
+      const advice = getParam('advice');
+      const happy = getParam('happy');
+      const neutral = getParam('neutral');
+      const surprise = getParam('surprise');
+      const scanTime = getParam('scanTime');
+      
+      document.getElementById('moodTitle').textContent = mood ? `You look ${mood}!` : 'Result';
+      
+      const emojiMap = {
+        happy:'😊', sad:'😢', angry:'😡', neutral:'😐', surprised:'😲', fearful:'😨', surprise:'😲'
+      };
+      document.getElementById('emoji').textContent = emojiMap[mood.toLowerCase()] || '😐';
+      
+      document.getElementById('confidence').textContent = confidence ? `${Math.round(parseFloat(confidence)*100)}%` : '—';
+      document.getElementById('adviceText').textContent = decodeURIComponent(advice) || '—';
+      document.getElementById('happy').textContent = happy ? `${happy}%` : '—';
+      document.getElementById('neutral').textContent = neutral ? `${neutral}%` : '—';
+      document.getElementById('surprise').textContent = surprise ? `${surprise}%` : '—';
+      document.getElementById('scanTime').textContent = scanTime || '—';
+    });
+    function scanAgain() { window.location.href = 'scan.html'; }
+    function done() { window.location.href = 'home.html'; }
+  </script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Scan</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/scan.css">
+</head>
+<body>
+
+<div class="scan-page">
+    <div class="scan-card">
+        <h2>Live Scan</h2>
+        <p class="scan-desc">Upload an image or use the camera for scans.</p>
+
+        <div class="scan-top">
+            <div class="scan-oval-frame" style="margin:18px auto 6px auto;">
+                <video id="webcam" autoplay playsinline width="320" height="240" style="background:#f3f4f6; border-radius:8px; z-index:1;"></video>
+                <div class="scan-oval"></div>
+                <div class="scan-green-bar"></div>
+                <canvas id="overlay" width="320" height="240" style="position:absolute;left:0;top:0;pointer-events:none; z-index:4;"></canvas>
+            </div>
+        </div>
+
+        <div id="loadingOverlay" class="loading-overlay" style="display:none;">
+            <div class="loader">Analyzing…</div>
+        </div>
+
+        <div class="scan-controls" style="display:flex; gap:14px; justify-content:center; align-items:center; margin-top:12px;">
+            <label class="plus-upload" title="Upload image" style="display:inline-flex;align-items:center;gap:10px;">
+                <input id="imageUploadDrop" type="file" accept="image/*" style="display:none">
+                <div class="plus-icon" style="width:86px; height:86px; border-radius:12px; border:3px solid #f5a623; display:flex; align-items:center; justify-content:center; font-size:40px; color:#f59e0b;">+</div>
+            </label>
+
+            <button id="startScanBtn" class="create-btn" onclick="startScan()">Start Scan</button>
+            <button id="stopScanBtn" class="create-btn" onclick="stopScan()" style="display:none">Stop</button>
+        </div>
+
+
+        <div class="progress-container" style="margin-top:18px; width:80%; margin-left:auto; margin-right:auto">
+            <div class="progress-bar" id="scanProgress" style="width:0%"></div>
+        </div>
+
+
+        <div id="scanResult" class="scan-result" style="display:none; opacity:0; transform:translateY(6px); transition: all 200ms ease-in-out; margin-top:18px;">
+            <h3 id="scanLabel">Emotion: —</h3>
+            <p id="scanConfidence">Confidence: —</p>
+            <div class="scan-actions" style="justify-content:center;">
+                <button class="create-btn" id="getAdviceBtn">Give me advice</button>
+                <button class="create-btn" id="skipAdviceBtn">No advice</button>
+            </div>
+        </div>
+
+        <canvas id="snapshot" width="224" height="224" style="display:none"></canvas>
+
+        <p style="text-align:center; margin-top:18px;"><a href="home.html" style="color:#3b4a64; text-decoration:none; font-weight:600;">← Back to Home</a></p>
+    </div>
+</div>
+
+<!-- TensorFlow.js and MobileNet (if used) -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.20.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
+<script src="js/sentiment.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

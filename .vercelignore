@@ -1,0 +1,15 @@
+node_modules
+python_ml_service
+.venv
+**pycache**
+_.pyc
+_.log
+.env.local
+.DS_Store
+docker-compose.yml
+Dockerfile
+_.md
+!README.md
+_.txt
+package-lock.json
+.git

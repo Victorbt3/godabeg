@@ -1,0 +1,43 @@
+version: "3.8"
+services:
+  db:
+    image: postgres:15
+    container_name: godabeg-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: godabeg
+      POSTGRES_USER: godabeguser
+      POSTGRES_PASSWORD: godabegpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  ml:
+    build: ./python_ml_service
+    container_name: godabeg-ml
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./python_ml_service/model_data:/app/model_data
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://godabeguser:godabegpass@db:5432/godabeg
+    depends_on:
+      - db
+  node:
+    build: .
+    container_name: godabeg-node
+    ports:
+      - "3000:3000"
+    environment:
+      - PY_SERVICE_URL=http://ml:8000
+      - DATABASE_URL=postgresql://godabeguser:godabegpass@db:5432/godabeg
+    depends_on:
+      - ml
+      - db
+    restart: unless-stopped
+
+# To start: docker-compose up --build -d
+
+volumes:
+  pgdata:

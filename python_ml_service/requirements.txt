@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+python-multipart
+pillow
+numpy
+opencv-python
+# Use tensorFlow when running under a TF-compatible Python (3.10/3.11). We'll install it into a 3.10 venv:
+tensorflow>=2.10
+asyncpg
+sqlalchemy
+textblob

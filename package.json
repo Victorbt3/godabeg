@@ -1,0 +1,26 @@
+{
+  "name": "godabeg",
+  "version": "2.0.0",
+  "description": "Emotion detection app with text analysis and live scan",
+  "main": "index.html",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "mkdir -p public && cp -r *.html css js images iages public/",
+    "vercel-build": "echo 'Static site - no build needed'"
+  },
+  "dependencies": {
+    "axios": "^1.4.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.18.2",
+    "form-data": "^4.0.0",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "sequelize": "^6.35.0",
+    "pg": "^8.11.0",
+    "pg-hstore": "^2.3.4"
+  },
+  "devDependencies": {},
+  "engines": { "node": ">=18" }
+}

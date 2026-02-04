@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GodaBeg - Quick Test</title>
+    <script src="js/sentiment.js"></script>
+</head>
+<body>
+    <h1>Testing Sentiment Analysis</h1>
+    <div id="results"></div>
+    
+    <script>
+        const tests = [
+            "I feel so happy today!",
+            "I'm really sad and depressed",
+            "This makes me so angry",
+            "I'm feeling okay, nothing special",
+            "Wow that's surprising!",
+            "I'm scared and worried"
+        ];
+        
+        const resultsDiv = document.getElementById('results');
+        
+        tests.forEach(text => {
+            const result = window.analyzeSentiment(text);
+            const p = document.createElement('p');
+            p.innerHTML = `<strong>"${text}"</strong><br>
+                          Emotion: ${result.emotion} | 
+                          Confidence: ${(result.confidence * 100).toFixed(1)}%`;
+            resultsDiv.appendChild(p);
+        });
+        
+        console.log('✅ All sentiment tests completed successfully!');
+    </script>
+</body>
+</html>

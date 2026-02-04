@@ -1,0 +1,152 @@
+body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background: #f3f4f6;
+}
+
+/* MAIN LAYOUT */
+.main-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* LEFT SIDE */
+.left-section {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 120px;
+}
+
+.logo {
+    width: 300px;
+    margin-bottom: 20px;
+}
+
+.left-section h1 {
+    font-size: 60px;
+    color: #2e3a4d;
+    margin: 0;
+}
+
+.subtitle {
+    color: #6b7280;
+    font-size: 22px;
+}
+
+/* RIGHT SIDE */
+.right-section {
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* FORM BOX */
+.form-box {
+    width: 420px;
+}
+
+/* INPUT STYLE */
+.input-box {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 1px solid #e5e7eb;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.icon {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.input-box input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 16px;
+}
+
+/* BUTTON */
+.create-btn {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 10px;
+    background: #3b4a64;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0px 6px 10px rgba(0,0,0,0.15);
+    margin-top: 10px;
+}
+
+.create-btn:hover {
+    opacity: 0.9;
+}
+
+/* LOGIN TEXT */
+.login-text {
+    text-align: center;
+    margin-top: 20px;
+    color: #6b7280;
+}
+
+.login-text span {
+    color: #2e3a4d;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* DASHBOARD / HOME PAGE */
+.dashboard .video-row {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 16px;
+}
+.controls {
+    display: flex;
+    gap: 8px;
+    flex-direction: column;
+}
+.capture-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+.dataset-grid {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+.thumb {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    padding: 8px;
+    border-radius: 8px;
+}
+.label-badge {
+    display:inline-block;
+    background:#e6eef8;
+    color:#2e3a4d;
+    padding:6px 10px;
+    border-radius:20px;
+    margin-right:8px;
+    margin-top:6px;
+}
+.prediction-result {
+    margin-top: 10px;
+    font-weight: bold;
+}
+.user-panel {
+    margin-top: 20px;
+}

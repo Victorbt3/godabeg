@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advice & Mood Board</title>
+  <link rel="stylesheet" href="bobu.txt">
+</head>
+<body>
+  <div class="layout">
+    <div class="side">
+      <div>
+        <h2 class="side-title">Mood Board</h2>
+        <p style="margin-top:30px;color:#8b95a7;max-width:200px;">See your recent moods, Gen Z advice, and text entries here.</p>
+      </div>
+    </div>
+    <div class="main">
+      <div class="result-top">
+        <div class="emotion-card">
+          <div class="emoji" id="emoji">😎</div>
+          <div class="emotion-title" id="moodTitle">Vibing</div>
+        </div>
+        <div class="stats">
+          <div class="row"><span class="label">Last Mood:</span><span class="value" id="lastMood">Happy</span></div>
+          <div class="row"><span class="label">Confidence:</span><span class="value" id="lastConfidence">98%</span></div>
+          <div class="row"><span class="label">Text Entry:</span><span class="value" id="lastText">"Feeling lit today!"</span></div>
+        </div>
+      </div>
+      <div class="advice">
+        <h3>Gen Z Advice</h3>
+        <p id="adviceText">Keep slaying, bestie. If you’re feeling down, blast your favorite playlist and remember: you’re the main character. 💅✨</p>
+      </div>
+      <div class="actions">
+        <button class="btn btn-outline" onclick="getNewAdvice()">New Advice</button>
+        <button class="btn btn-solid" onclick="goToScan()">Scan Again</button>
+      </div>
+    </div>
+  </div>
+  <script src="js/advice.js"></script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div class="main-container">
+
+    <!-- LEFT SIDE (Sidebar) -->
+    <div class="left-section sidebar-menu">
+        <img src="images/profile-image.svg" class="logo" alt="Fakoya AI Logo">
+
+        <ul class="menu-list">
+            <li><a href="scan.html">Start a live scan</a></li>
+            <li><a href="settings.html">Settings</a></li>
+            <li><a href="history.html">Your History</a></li>
+            <li><a href="#" onclick="logout();return false;">Logout</a></li>
+        </ul>
+
+        <div class="user-panel">
+            <p>Signed in as <strong id="userEmail">—</strong></p>
+        </div>
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="right-section">
+        <div class="page-header">
+            <a href="about.html" class="about-link">About Us</a>
+        </div>
+
+        <div class="main-area">
+            <div class="panel">
+                <h2 class="panel-title">⚙️ Settings &amp; Privacy</h2>
+                <div class="panel-body">
+                    <h3 style="color:#223e62;margin-top:0;">General Settings</h3>
+                    <label class="toggle-row">
+                        <input type="checkbox" id="settingAutoScan">
+                        <span>Auto-start live scan on Scan page</span>
+                    </label>
+                    <label class="toggle-row">
+                        <input type="checkbox" id="settingSaveHistory">
+                        <span>Save analysis history locally</span>
+                    </label>
+                    <label class="toggle-row">
+                        <input type="checkbox" id="settingShareData">
+                        <span>Allow sharing anonymized usage data</span>
+                    </label>
+                    
+                    <hr style="margin:20px 0;border:none;border-top:1px solid #ddd;">
+                    
+                    <h3 style="color:#223e62;">Notifications</h3>
+                    <label class="toggle-row">
+                        <input type="checkbox" id="settingNotifications" checked>
+                        <span>Enable browser notifications</span>
+                    </label>
+                    <label class="toggle-row">
+                        <input type="checkbox" id="settingDailyReminder">
+                        <span>Daily mood check reminder</span>
+                    </label>
+                    
+                    <hr style="margin:20px 0;border:none;border-top:1px solid #ddd;">
+                    
+                    <h3 style="color:#223e62;">Appearance</h3>
+                    <label class="toggle-row" style="flex-direction:column;align-items:flex-start;">
+                        <span style="margin-bottom:8px;">Theme</span>
+                        <select id="settingTheme" style="padding:8px;border-radius:4px;border:1px solid #ddd;width:100%;max-width:200px;">
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                            <option value="auto">Auto (System)</option>
+                        </select>
+                    </label>
+                    
+                    <hr style="margin:20px 0;border:none;border-top:1px solid #ddd;">
+                    
+                    <h3 style="color:#223e62;">Data Management</h3>
+                    <div class="panel-actions">
+                        <button class="create-btn" onclick="saveSettings()">💾 Save Settings</button>
+                        <button class="create-btn secondary" onclick="exportHistory()">📤 Export History</button>
+                        <button class="create-btn secondary" onclick="clearLocalHistory()">🗑️ Clear Local History</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.20.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
+<script src="js/sentiment.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div class="main-container">
+
+    <!-- LEFT SIDE (Sidebar) -->
+    <div class="left-section sidebar-menu">
+        <img src="images/logo22.svg" class="logo" alt="Fakoya AI Logo">
+
+        <ul class="menu-list">
+            <li><a href="scan.html">Start a live scan</a></li>
+            <li><a href="#" onclick="openSettings();return false;">Settings & Privacy</a></li>
+            <li><a href="#" onclick="showHistory();return false;">Your History</a></li>
+            <li><a href="#" onclick="logout();return false;">Logout</a></li>
+        </ul>
+
+        <div class="user-panel">
+            <p>Signed in as <strong id="userEmail">—</strong></p>
+        </div>
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="right-section">
+        <div class="page-header">
+            <a href="about.html" class="about-link">About Us</a>
+        </div>    
+
+        <!-- Main content / text analysis area -->
+        <div class="main-area">
+            <div class="hero">
+                <img src="images/logo22.svg" class="hero-image" alt="Hero">
+                <h1>How are you feeling today?</h1>
+                <p class="subtitle">Type how you feel or use the live scanner to analyze your expression — I'll give you feedback and advice.</p>
+            </div>
+
+            <div class="text-analysis">
+                <div id="chatArea" class="chat-area" aria-live="polite"></div>
+                <div class="chat-input">
+                    <input id="chatInput" type="text" placeholder="Tell me how you feel">
+                    <button id="chatSend" class="send-btn" onclick="handleChatSend()"><img src="images/arrow-icon.svg" alt="Send"></button>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+
+</div>
+
+<!-- TensorFlow.js and MobileNet -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.20.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
+<script src="js/app.js"></script>
+</body>
+<!-- </html> -->
