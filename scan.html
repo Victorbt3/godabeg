@@ -42,6 +42,10 @@
             <div class="progress-bar" id="scanProgress" style="width:0%"></div>
         </div>
 
+        <div id="realtimeEmotion" style="margin-top:12px; text-align:center; min-height:60px;">
+            <h3 style="color:#3b4a64; font-size:1.3em; margin:8px 0;">Detecting...</h3>
+            <p style="color:#64748b; font-size:0.95em;">Position your face in the oval</p>
+        </div>
 
         <div id="scanResult" class="scan-result" style="display:none; opacity:0; transform:translateY(6px); transition: all 200ms ease-in-out; margin-top:18px;">
             <h3 id="scanLabel">Emotion: —</h3>
@@ -63,6 +67,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
 <script src="js/sentiment.js"></script>
+<script src="js/realtime-emotion.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

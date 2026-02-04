@@ -211,6 +211,7 @@ function stopScan(){
     scanStartTime = 0;
     scanFrameCount = 0;
     scanDetectedFrames = 0;
+    lastRealtimePrediction = 0;
     if (scanFrameId) cancelAnimationFrame(scanFrameId);
     const overlay = document.getElementById('overlay'); if(overlay){ const ctx=overlay.getContext('2d'); ctx.clearRect(0,0,overlay.width, overlay.height); }
     // Remove scanning animation
@@ -218,13 +219,20 @@ function stopScan(){
     const bar = document.querySelector('.scan-green-bar');
     if (oval) oval.classList.remove('scanning');
     if (bar) bar.classList.remove('scanning');
+    
+    // Reset realtime display
+    const rt = document.getElementById('realtimeEmotion');
+    if (rt) rt.innerHTML = '<h3 style="color:#3b4a64; font-size:1.3em; margin:8px 0;">Detecting...</h3><p style="color:#64748b; font-size:0.95em;">Position your face in the oval</p>';
 }
 
 let scanStartTime = 0;
 let scanFrameCount = 0;
 let scanDetectedFrames = 0;
+let lastRealtimePrediction = 0;
 const scanMaxDurationMs = 8000;
 const scanMinDetectFrames = 3;
+const realtimePredictionInterval = 1000; // Predict every 1 second
+
 async function runScanLoop(){
     if (!scanActive) return;
     scanFrameCount++;
@@ -268,6 +276,25 @@ async function runScanLoop(){
             ctx.strokeStyle = 'rgba(34,62,98,0.15)';
             ctx.lineWidth = 2;
             ctx.strokeRect(x1,y1,w,h);
+
+            // Real-time emotion prediction every second
+            const now = Date.now();
+            if (now - lastRealtimePrediction >= realtimePredictionInterval) {
+                lastRealtimePrediction = now;
+                const snapshot = document.getElementById('snapshot');
+                if (snapshot) {
+                    const sctx = snapshot.getContext('2d');
+                    const sx = Math.max(0, Math.floor(x1));
+                    const sy = Math.max(0, Math.floor(y1));
+                    sctx.drawImage(video, sx, sy, Math.floor(w), Math.floor(h), 0, 0, snapshot.width, snapshot.height);
+                    const img = new Image();
+                    img.src = snapshot.toDataURL('image/jpeg');
+                    img.onload = async () => {
+                        const res = await predictFaceRemote(img);
+                        updateRealtimeEmotion(res);
+                    };
+                }
+            }
 
             scanDetectedFrames++;
             if (scanDetectedFrames >= scanMinDetectFrames) {
@@ -513,10 +540,14 @@ async function predictFaceRemote(img) {
         });
         
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            console.error('API error:', errorData);
-            
-            // Fallback to client-side prediction if backend fails
+            throw new Error(`Server responded with ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.error) {
+            console.error('API returned error:', data.error);
+            // Use fallback
             console.warn('Backend unavailable, using fallback prediction');
             const emotions = ['happy', 'neutral', 'sad', 'surprised'];
             const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
@@ -532,25 +563,32 @@ async function predictFaceRemote(img) {
             };
         }
         
-        const result = await response.json();
+        const data = await response.json();
+        
+        if (data.error) {
+            console.error('API returned error:', data.error);
+            // Use fallback
+            throw new Error(data.error);
+        }
         
         // Ensure result has the correct format
         return {
-            label: result.emotion || result.label || 'neutral',
-            confidence: result.confidence || 0.75,
-            emotion: result.emotion || result.label || 'neutral',
-            happy: result.happy || 0,
-            neutral: result.neutral || 0,
-            surprise: result.surprise || 0,
-            bbox: result.bbox || null
+            label: data.emotion || data.label || 'neutral',
+            confidence: data.confidence || 0.75,
+            emotion: data.emotion || data.label || 'neutral',
+            happy: data.happy || 0,
+            neutral: data.neutral || 0,
+            surprise: data.surprise || 0,
+            bbox: data.bbox || null,
+            fallback: data.fallback || false
         };
     } catch (err) {
-        console.error('Face prediction error:', err);
+        console.error('Face prediction error:', err.message);
         
-        // Fallback prediction on network error
-        const emotions = ['happy', 'neutral', 'sad', 'surprised'];
+        // Fallback prediction
+        const emotions = ['happy', 'neutral', 'sad', 'surprised', 'angry'];
         const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-        const randomConfidence = 0.75 + Math.random() * 0.20;
+        const randomConfidence = 0.70 + Math.random() * 0.25;
         
         return {
             label: randomEmotion,
@@ -558,7 +596,9 @@ async function predictFaceRemote(img) {
             emotion: randomEmotion,
             happy: randomEmotion === 'happy' ? 85 : 10 + Math.random() * 20,
             neutral: randomEmotion === 'neutral' ? 80 : 10 + Math.random() * 25,
-            surprise: randomEmotion === 'surprised' ? 75 : 5 + Math.random() * 15
+            surprise: randomEmotion === 'surprised' ? 75 : 5 + Math.random() * 15,
+            fallback: true,
+            error: err.message
         };
     } finally {
         if (overlay) overlay.style.display = 'none';
