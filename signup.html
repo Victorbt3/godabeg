@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log In</title>
+    <title>Create Account</title>
     <link rel="stylesheet" href="css/styles.css">
 </head> 
 <body>
@@ -14,8 +14,8 @@
     <div class="left-section">
         <img src="iages/logo.jpeg" class="logo" alt="Fakoya AI Logo">
 
-        <h1>Welcome Back</h1>
-        <p class="subtitle">Sign in to continue to Emotion Recognizer</p> 
+        <h1>Create Account</h1>
+        <p class="subtitle">Let's get started</p> 
     </div>
 
     <!-- RIGHT SIDE -->
@@ -24,19 +24,29 @@
         <div class="form-box">
 
             <div class="input-box">
+                <span class="icon">👤</span>
+                <input type="text" placeholder="Your Name">
+            </div>
+
+            <div class="input-box">
                 <span class="icon">✉️</span>
-                <input id="email" type="email" placeholder="Your Email">
+                <input type="email" placeholder="Your Email">
             </div>
 
             <div class="input-box">
                 <span class="icon">🔒</span>
-                <input id="password" type="password" placeholder="Password">
+                <input type="password" placeholder="Password">
             </div>
 
-            <button class="create-btn" onclick="loginUser()">Log In</button>
+            <div class="input-box">
+                <span class="icon">🔒</span>
+                <input type="password" placeholder="Confirm Password">
+            </div>
+
+            <button class="create-btn" onclick="createAccount()">Create Account</button>
 
             <p class="login-text">
-                Don't have an account? <a href="signup.html"><span>Create Account</span></a>
+                Do you have an account? <a href="login.html"><span>Log In</span></a>
             </p>
 
         </div>
@@ -47,4 +57,4 @@
 
 <script src="js/app.js"></script>
 </body>
-</html> 
+</html>  
