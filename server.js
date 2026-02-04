@@ -9,6 +9,7 @@ const morgan = require('morgan');
 const app = express();
 app.use(cors());
 app.use(morgan('dev'));
+app.use(express.json()); // Parse JSON request bodies
 
 // serve frontend files (home.html, scan.html, css, js, etc.) from project root
 const path = require('path');
@@ -116,25 +117,57 @@ app.post('/save_text_entry', express.json(), async (req, res) => {
 });
 
 // --- User Registration ---
-app.post('/api/register', async (req, res) => {
+app.post('/api/register', express.json(), async (req, res) => {
   const { email, password, name } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'missing_fields' });
+  
   try {
-    const user = await User.create({ email, password, name });
-    res.json({ id: user.id, email: user.email, name: user.name });
+    if (dbAvailable && User) {
+      const user = await User.create({ email, password, name });
+      return res.json({ id: user.id, email: user.email, name: user.name });
+    } else {
+      // In-memory storage
+      if (users.has(email.toLowerCase())) {
+        return res.status(409).json({ error: 'email_exists' });
+      }
+      const user = { 
+        id: userIdCounter++, 
+        email: email.toLowerCase(), 
+        password, 
+        name: name || email.split('@')[0] 
+      };
+      users.set(email.toLowerCase(), user);
+      return res.json({ id: user.id, email: user.email, name: user.name });
+    }
   } catch (e) {
-    if (e.name === 'SequelizeUniqueConstraintError') return res.status(409).json({ error: 'email_exists' });
-    res.status(500).json({ error: 'db_error' });
+    if (e.name === 'SequelizeUniqueConstraintError') {
+      return res.status(409).json({ error: 'email_exists' });
+    }
+    return res.status(500).json({ error: 'db_error', message: e.message });
   }
 });
 
 // --- User Login ---
-app.post('/api/login', async (req, res) => {
+app.post('/api/login', express.json(), async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'missing_fields' });
-  const user = await User.findOne({ where: { email, password } });
-  if (!user) return res.status(401).json({ error: 'invalid_credentials' });
-  res.json({ id: user.id, email: user.email, name: user.name });
+  
+  try {
+    if (dbAvailable && User) {
+      const user = await User.findOne({ where: { email, password } });
+      if (!user) return res.status(401).json({ error: 'invalid_credentials' });
+      return res.json({ id: user.id, email: user.email, name: user.name });
+    } else {
+      // In-memory storage
+      const user = users.get(email.toLowerCase());
+      if (!user || user.password !== password) {
+        return res.status(401).json({ error: 'invalid_credentials' });
+      }
+      return res.json({ id: user.id, email: user.email, name: user.name });
+    }
+  } catch (e) {
+    return res.status(500).json({ error: 'server_error', message: e.message });
+  }
 });
 
 // --- Save Scan Result ---
@@ -186,21 +219,37 @@ app.get('/api/history/:userId', async (req, res) => {
   }
 });
 
-// --- DB Setup (skip for serverless) ---
+// --- In-Memory Storage (fallback when no DB) ---
+const users = new Map(); // email -> {id, name, email, password}
+const scans = [];
+const textEntries = [];
+const adviceList = [];
+let userIdCounter = 1;
+
+// --- DB Setup (optional) ---
 let User, Scan, TextEntry, Advice, sequelize;
+let dbAvailable = false;
+
 if (!process.env.VERCEL) {
-  const db = require('./db');
-  sequelize = db.sequelize;
-  User = db.User;
-  Scan = db.Scan;
-  TextEntry = db.TextEntry;
-  Advice = db.Advice;
-  
-  sequelize.sync().then(() => {
-    console.log('Database synced');
-  }).catch(err => {
-    console.error('DB sync error:', err);
-  });
+  try {
+    const db = require('./db');
+    sequelize = db.sequelize;
+    User = db.User;
+    Scan = db.Scan;
+    TextEntry = db.TextEntry;
+    Advice = db.Advice;
+    
+    sequelize.sync().then(() => {
+      console.log('✅ Database connected and synced');
+      dbAvailable = true;
+    }).catch(err => {
+      console.warn('⚠️  Database unavailable, using in-memory storage');
+      dbAvailable = false;
+    });
+  } catch (err) {
+    console.warn('⚠️  Database module not available, using in-memory storage');
+    dbAvailable = false;
+  }
 }
 
 // For Vercel serverless
@@ -208,6 +257,8 @@ if (process.env.VERCEL) {
   module.exports = app;
 } else {
   app.listen(PORT, () => {
-    console.log(`Node proxy server running on http://localhost:${PORT} → forwarding to ${PY_SERVICE}`);
+    console.log(`\n🚀 Server running on http://localhost:${PORT}`);
+    console.log(`📡 Python ML service: ${PY_SERVICE}`);
+    console.log(`💾 Database: ${dbAvailable ? 'Connected' : 'In-Memory Mode'}\n`);
   });
 }

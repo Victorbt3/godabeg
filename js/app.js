@@ -8,7 +8,7 @@ let classifier = null; // tf model
 let predicting = false;
 let predictInterval = null;
 
-function createAccount() {
+async function createAccount() {
     const nameInput = document.querySelector('input[placeholder="Your Name"]');
     const emailInput = document.querySelector('input[placeholder="Your Email"]');
     const passwordInput = document.querySelector('input[placeholder="Password"]');
@@ -44,6 +44,37 @@ function createAccount() {
         return;
     }
     
+    // Try server first
+    try {
+        const response = await fetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Save to localStorage as backup
+            const accounts = JSON.parse(localStorage.getItem('accounts') || '{}');
+            accounts[email] = { name, email, password, createdAt: new Date().toISOString() };
+            localStorage.setItem('accounts', JSON.stringify(accounts));
+            
+            alert('✅ Account created successfully! Please log in.');
+            window.location = 'login.html';
+            return;
+        }
+        
+        if (data.error === 'email_exists') {
+            alert('This email is already registered. Please log in instead.');
+            window.location = 'login.html';
+            return;
+        }
+    } catch (err) {
+        console.log('Server unavailable, using offline mode');
+    }
+    
+    // Fallback to localStorage
     const accounts = JSON.parse(localStorage.getItem('accounts') || '{}');
     if (accounts[email]) {
         alert('This email is already registered. Please log in instead.');
@@ -57,7 +88,7 @@ function createAccount() {
     window.location = 'login.html';
 }
 
-function loginUser() {
+async function loginUser() {
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
     
@@ -74,6 +105,33 @@ function loginUser() {
         return;
     }
     
+    // Try server first
+    try {
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        
+        if (response.ok) {
+            const user = await response.json();
+            localStorage.setItem('currentUser', email);
+            localStorage.setItem('userName', user.name || email);
+            localStorage.setItem('userId', user.id);
+            
+            // Sync to localStorage
+            const accounts = JSON.parse(localStorage.getItem('accounts') || '{}');
+            accounts[email] = { name: user.name, email, password };
+            localStorage.setItem('accounts', JSON.stringify(accounts));
+            
+            window.location = 'home.html';
+            return;
+        }
+    } catch (err) {
+        console.log('Server unavailable, using offline mode');
+    }
+    
+    // Fallback to localStorage
     const accounts = JSON.parse(localStorage.getItem('accounts') || '{}');
     
     if (accounts[email] && accounts[email].password === password) {
