@@ -239,7 +239,11 @@ async function runScanLoop(){
     const video = document.getElementById('webcam');
     const overlay = document.getElementById('overlay');
     const progress = document.getElementById('scanProgress');
-    if (!video || !overlay) return;
+    if (!video || !overlay) {
+        console.error('Video or overlay element not found');
+        stopScan();
+        return;
+    }
     const ctx = overlay.getContext('2d');
     ctx.clearRect(0,0,overlay.width, overlay.height);
 
@@ -247,6 +251,13 @@ async function runScanLoop(){
         const elapsed = Date.now() - scanStartTime;
         const percent = Math.min(100, Math.round((elapsed / scanMaxDurationMs) * 100));
         if (progress) progress.style.width = Math.max(5, percent) + '%';
+
+        if (!blazefaceModel) {
+            console.error('BlazeFace model not loaded');
+            stopScan();
+            alert('Face detection model not loaded. Please refresh the page.');
+            return;
+        }
 
         const returnTensors = false;
         const preds = await blazefaceModel.estimateFaces(video, returnTensors);
@@ -264,6 +275,11 @@ async function runScanLoop(){
                 if (progress) progress.style.width = '100%';
 
                 const snapshot = document.getElementById('snapshot');
+                if (!snapshot) {
+                    console.error('Snapshot canvas not found');
+                    stopScan();
+                    return;
+                }
                 const sctx = snapshot.getContext('2d');
                 sctx.clearRect(0,0,snapshot.width,snapshot.height);
                 const sx = Math.max(0,Math.floor(x1));
@@ -275,7 +291,13 @@ async function runScanLoop(){
                 await new Promise(r => img.onload = r);
 
                 const res = await predictFaceRemote(img);
-                await showScanResult(res);
+                if (res && !res.error) {
+                    await showScanResult(res);
+                } else {
+                    console.error('Prediction failed:', res);
+                    alert('Scan failed. Please try again.');
+                    stopScan();
+                }
                 return;
             }
         } else {
@@ -289,7 +311,10 @@ async function runScanLoop(){
             }
         }
     } catch (e) {
-        console.warn('Scan error', e);
+        console.error('Scan loop error:', e);
+        stopScan();
+        alert('Scan error: ' + e.message);
+        return;
     }
 
     scanFrameId = requestAnimationFrame(runScanLoop);
