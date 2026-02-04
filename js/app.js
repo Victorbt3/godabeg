@@ -8,86 +8,80 @@ let classifier = null; // tf model
 let predicting = false;
 let predictInterval = null;
 
-async function createAccount() {
-    const name = document.querySelector('input[placeholder="Your Name"]').value;
-    const email = document.querySelector('input[placeholder="Your Email"]').value;
-    const password = document.querySelector('input[placeholder="Password"]').value;
+function createAccount() {
+    const nameInput = document.querySelector('input[placeholder="Your Name"]');
+    const emailInput = document.querySelector('input[placeholder="Your Email"]');
+    const passwordInput = document.querySelector('input[placeholder="Password"]');
+    const confirmInput = document.querySelector('input[placeholder="Confirm Password"]');
     
-    if (!email || !password) {
-        alert('Please provide email and password');
+    if (!nameInput || !emailInput || !passwordInput) {
+        alert('Please fill in all fields');
         return;
     }
     
-    try {
-        // Try server registration first
-        const response = await fetch('/api/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password })
-        });
-        
-        if (response.ok) {
-            alert('Account created successfully! You can now log in.');
-            window.location = 'login.html';
-            return;
-        }
-        
-        const error = await response.json();
-        if (error.error === 'email_exists') {
-            alert('This email is already registered. Please log in.');
-            return;
-        }
-    } catch (err) {
-        console.warn('Server registration unavailable, using local storage fallback');
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim().toLowerCase();
+    const password = passwordInput.value;
+    const confirm = confirmInput ? confirmInput.value : password;
+    
+    if (!name) {
+        alert('Please enter your name');
+        return;
     }
     
-    // Fallback to localStorage
+    if (!email || !email.includes('@')) {
+        alert('Please enter a valid email address');
+        return;
+    }
+    
+    if (!password || password.length < 4) {
+        alert('Password must be at least 4 characters');
+        return;
+    }
+    
+    if (password !== confirm) {
+        alert('Passwords do not match');
+        return;
+    }
+    
     const accounts = JSON.parse(localStorage.getItem('accounts') || '{}');
     if (accounts[email]) {
-        alert('This email is already registered. Please log in.');
+        alert('This email is already registered. Please log in instead.');
+        window.location = 'login.html';
         return;
     }
-    accounts[email] = { name, email, password };
+    
+    accounts[email] = { name, email, password, createdAt: new Date().toISOString() };
     localStorage.setItem('accounts', JSON.stringify(accounts));
-    alert('Account created successfully! You can now log in.');
+    alert('✅ Account created successfully! Please log in.');
     window.location = 'login.html';
 }
 
-async function loginUser() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+function loginUser() {
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    
+    if (!emailInput || !passwordInput) {
+        alert('Please fill in all fields');
+        return;
+    }
+    
+    const email = emailInput.value.trim().toLowerCase();
+    const password = passwordInput.value;
     
     if (!email || !password) {
         alert('Please enter both email and password');
         return;
     }
     
-    try {
-        // Try server login first
-        const response = await fetch('/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
-        
-        if (response.ok) {
-            const user = await response.json();
-            localStorage.setItem('currentUser', email);
-            localStorage.setItem('userId', user.id);
-            window.location = 'home.html';
-            return;
-        }
-    } catch (err) {
-        console.warn('Server login unavailable, using local storage fallback');
-    }
-    
-    // Fallback to localStorage
     const accounts = JSON.parse(localStorage.getItem('accounts') || '{}');
+    
     if (accounts[email] && accounts[email].password === password) {
         localStorage.setItem('currentUser', email);
+        localStorage.setItem('userName', accounts[email].name || email);
         window.location = 'home.html';
     } else {
-        alert('Invalid credentials. Please check your email and password.');
+        alert('❌ Invalid email or password. Please try again or create an account.');
     }
 }
 

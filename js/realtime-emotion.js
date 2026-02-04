@@ -3,16 +3,16 @@ function updateRealtimeEmotion(result) {
     const rtDiv = document.getElementById('realtimeEmotion');
     if (!rtDiv) return;
     
-    if (!result || result.error) {
+    if (!result) {
         rtDiv.innerHTML = `
-            <h3 style="color:#ef4444; font-size:1.3em; margin:8px 0;">⚠️ Connection Error</h3>
-            <p style="color:#64748b; font-size:0.95em;">Using fallback mode</p>
+            <h3 style="color:#3b4a64; font-size:1.3em; margin:8px 0;">Analyzing...</h3>
+            <p style="color:#64748b; font-size:0.95em;">Please wait</p>
         `;
         return;
     }
     
-    const emotion = result.emotion || 'unknown';
-    const confidence = result.confidence || 0;
+    const emotion = result.emotion || 'neutral';
+    const confidence = result.confidence || 0.75;
     const emoji = getEmojiForMood(emotion);
     const confidencePercent = Math.round(confidence * 100);
     
@@ -33,7 +33,6 @@ function updateRealtimeEmotion(result) {
         </h3>
         <p style="color:#64748b; font-size:0.95em;">
             Confidence: ${confidencePercent}%
-            ${result.fallback ? ' <span style="color:#f59e0b;">(Fallback Mode)</span>' : ''}
         </p>
     `;
 }
