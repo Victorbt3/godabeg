@@ -581,7 +581,31 @@ function loadSettings() {
     if (shareData) shareData.checked = settings.shareData;
     if (notifications) notifications.checked = settings.notifications;
     if (dailyReminder) dailyReminder.checked = settings.dailyReminder;
-    if (theme) theme.value = settings.theme;
+    if (theme) {
+        theme.value = settings.theme;
+        // Add event listener for immediate theme change
+        theme.addEventListener('change', function() {
+            applyTheme(this.value);
+        });
+    }
+    
+    // Apply theme on page load
+    applyTheme(settings.theme);
+}
+
+function applyTheme(theme) {
+    if (theme === 'dark') {
+        document.body.classList.add('dark-mode');
+    } else if (theme === 'light') {
+        document.body.classList.remove('dark-mode');
+    } else if (theme === 'auto') {
+        // Auto mode - use system preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+        }
+    }
 }
 
 function saveSettings() {
@@ -601,6 +625,10 @@ function saveSettings() {
         theme: theme ? theme.value : 'light'
     };
     localStorage.setItem('settings', JSON.stringify(settings));
+    
+    // Apply theme immediately after saving
+    applyTheme(settings.theme);
+    
     alert('✅ Settings saved successfully!');
 }
 
