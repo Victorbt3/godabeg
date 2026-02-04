@@ -3,37 +3,252 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scan Result</title>
-  <link rel="stylesheet" href="bobu.txt">
+  <title>Scan Result - GodaBeg</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      animation: slideUp 0.4s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 30px;
+      text-align: center;
+      color: white;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 40px;
+    }
+
+    .emotion-display {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .emoji {
+      font-size: 120px;
+      line-height: 1;
+      margin-bottom: 20px;
+      animation: bounce 0.6s ease-out;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .emotion-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: #2d3748;
+      margin-bottom: 10px;
+    }
+
+    .emotion-subtitle {
+      font-size: 16px;
+      color: #718096;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      background: #f7fafc;
+      border-radius: 12px;
+      padding: 20px;
+      border: 2px solid #e2e8f0;
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      border-color: #667eea;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: #718096;
+      margin-bottom: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #2d3748;
+    }
+
+    .advice-section {
+      background: linear-gradient(135deg, #f6f8fb 0%, #e9ecef 100%);
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 30px;
+      border-left: 4px solid #667eea;
+    }
+
+    .advice-section h3 {
+      font-size: 20px;
+      color: #2d3748;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .advice-section h3::before {
+      content: '💡';
+      font-size: 24px;
+    }
+
+    .advice-text {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #4a5568;
+    }
+
+    .actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 16px 32px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s ease;
+      min-width: 160px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #667eea;
+      border: 2px solid #667eea;
+    }
+
+    .btn-secondary:hover {
+      background: #f7fafc;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+      .container { border-radius: 16px; }
+      .content { padding: 24px; }
+      .header { padding: 24px; }
+      .header h1 { font-size: 24px; }
+      .emoji { font-size: 80px; }
+      .emotion-title { font-size: 24px; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .btn { width: 100%; }
+    }
+  </style>
 </head>
 <body>
-  <div class="layout">
-    <div class="side">
-      <div>
-        <h2 class="side-title">Your History</h2>
-      </div>
+  <div class="container">
+    <div class="header">
+      <h1>Your Emotion Scan Result</h1>
+      <p>Analyzed and ready for you</p>
     </div>
-    <div class="main">
-      <div class="result-top">
-        <div class="emotion-card">
-          <div class="emoji" id="emoji">😐</div>
-          <div class="emotion-title" id="moodTitle">Result</div>
+    
+    <div class="content">
+      <div class="emotion-display">
+        <div class="emoji" id="emoji">😐</div>
+        <div class="emotion-title" id="moodTitle">Processing...</div>
+        <div class="emotion-subtitle">Your current emotional state</div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Confidence</div>
+          <div class="stat-value" id="confidence">—</div>
         </div>
-        <div class="stats">
-          <div class="row"><span class="label">Confidence:</span><span class="value" id="confidence">—</span></div>
-          <div class="row"><span class="label">Happy:</span><span class="value" id="happy">—</span></div>
-          <div class="row"><span class="label">Neutral:</span><span class="value" id="neutral">—</span></div>
-          <div class="row"><span class="label">Surprise:</span><span class="value" id="surprise">—</span></div>
-          <div class="row"><span class="label">Scan time:</span><span class="value" id="scanTime">—</span></div>
+        <div class="stat-card">
+          <div class="stat-label">Happy</div>
+          <div class="stat-value" id="happy">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Neutral</div>
+          <div class="stat-value" id="neutral">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Surprise</div>
+          <div class="stat-value" id="surprise">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Scan Time</div>
+          <div class="stat-value" id="scanTime">—</div>
         </div>
       </div>
-      <div class="advice">
-        <h3>Advice</h3>
-        <p id="adviceText">—</p>
+
+      <div class="advice-section">
+        <h3>Personalized Advice</h3>
+        <p class="advice-text" id="adviceText">Loading your personalized advice...</p>
       </div>
+
       <div class="actions">
-        <button class="btn btn-outline" onclick="scanAgain()">Scan Again</button>
-        <button class="btn btn-solid" onclick="done()">Done</button>
+        <button class="btn btn-secondary" onclick="scanAgain()">🔄 Scan Again</button>
+        <button class="btn btn-primary" onclick="done()">✓ Done</button>
       </div>
     </div>
   </div>

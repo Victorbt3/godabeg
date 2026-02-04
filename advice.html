@@ -3,36 +3,252 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Advice & Mood Board</title>
-  <link rel="stylesheet" href="bobu.txt">
+  <title>Mood Board & Advice - GodaBeg</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      animation: slideUp 0.4s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .header {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      padding: 30px;
+      text-align: center;
+      color: white;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 40px;
+    }
+
+    .mood-display {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .emoji {
+      font-size: 120px;
+      line-height: 1;
+      margin-bottom: 20px;
+      animation: bounce 0.6s ease-out;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .mood-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: #2d3748;
+      margin-bottom: 10px;
+    }
+
+    .mood-subtitle {
+      font-size: 16px;
+      color: #718096;
+    }
+
+    .stats-section {
+      background: #f7fafc;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 30px;
+      border: 2px solid #e2e8f0;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .stat-row:last-child {
+      border-bottom: none;
+    }
+
+    .stat-label {
+      font-size: 16px;
+      color: #4a5568;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2d3748;
+    }
+
+    .advice-section {
+      background: linear-gradient(135deg, #fff5f7 0%, #ffe6eb 100%);
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 30px;
+      border-left: 4px solid #f5576c;
+      position: relative;
+    }
+
+    .advice-section::before {
+      content: '"';
+      position: absolute;
+      top: 10px;
+      left: 20px;
+      font-size: 60px;
+      color: #f5576c;
+      opacity: 0.2;
+      font-family: Georgia, serif;
+    }
+
+    .advice-section h3 {
+      font-size: 20px;
+      color: #2d3748;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .advice-section h3::before {
+      content: '✨';
+      font-size: 24px;
+    }
+
+    .advice-text {
+      font-size: 18px;
+      line-height: 1.7;
+      color: #4a5568;
+      font-style: italic;
+    }
+
+    .actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 16px 32px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s ease;
+      min-width: 160px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(245, 87, 108, 0.5);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #f5576c;
+      border: 2px solid #f5576c;
+    }
+
+    .btn-secondary:hover {
+      background: #fff5f7;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+      .container { border-radius: 16px; }
+      .content { padding: 24px; }
+      .header { padding: 24px; }
+      .header h1 { font-size: 24px; }
+      .emoji { font-size: 80px; }
+      .mood-title { font-size: 24px; }
+      .actions { flex-direction: column; }
+      .btn { width: 100%; }
+    }
+  </style>
 </head>
 <body>
-  <div class="layout">
-    <div class="side">
-      <div>
-        <h2 class="side-title">Mood Board</h2>
-        <p style="margin-top:30px;color:#8b95a7;max-width:200px;">See your recent moods, Gen Z advice, and text entries here.</p>
-      </div>
+  <div class="container">
+    <div class="header">
+      <h1>Your Mood Board</h1>
+      <p>Track your vibes and get personalized advice</p>
     </div>
-    <div class="main">
-      <div class="result-top">
-        <div class="emotion-card">
-          <div class="emoji" id="emoji">😎</div>
-          <div class="emotion-title" id="moodTitle">Vibing</div>
+    
+    <div class="content">
+      <div class="mood-display">
+        <div class="emoji" id="emoji">😎</div>
+        <div class="mood-title" id="moodTitle">Vibing</div>
+        <div class="mood-subtitle">You're doing great!</div>
+      </div>
+
+      <div class="stats-section">
+        <div class="stat-row">
+          <span class="stat-label">Last Mood</span>
+          <span class="stat-value" id="lastMood">Happy</span>
         </div>
-        <div class="stats">
-          <div class="row"><span class="label">Last Mood:</span><span class="value" id="lastMood">Happy</span></div>
-          <div class="row"><span class="label">Confidence:</span><span class="value" id="lastConfidence">98%</span></div>
-          <div class="row"><span class="label">Text Entry:</span><span class="value" id="lastText">"Feeling lit today!"</span></div>
+        <div class="stat-row">
+          <span class="stat-label">Confidence Level</span>
+          <span class="stat-value" id="lastConfidence">98%</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Text Entry</span>
+          <span class="stat-value" id="lastText">"Feeling lit today!"</span>
         </div>
       </div>
-      <div class="advice">
+
+      <div class="advice-section">
         <h3>Gen Z Advice</h3>
-        <p id="adviceText">Keep slaying, bestie. If you’re feeling down, blast your favorite playlist and remember: you’re the main character. 💅✨</p>
+        <p class="advice-text" id="adviceText">Keep slaying, bestie. If you're feeling down, blast your favorite playlist and remember: you're the main character. 💅✨</p>
       </div>
+
       <div class="actions">
-        <button class="btn btn-outline" onclick="getNewAdvice()">New Advice</button>
-        <button class="btn btn-solid" onclick="goToScan()">Scan Again</button>
+        <button class="btn btn-secondary" onclick="getNewAdvice()">🔄 New Advice</button>
+        <button class="btn btn-primary" onclick="goToScan()">📸 Scan Again</button>
       </div>
     </div>
   </div>
