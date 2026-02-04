@@ -26,7 +26,23 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.get('/health', (req, res) => res.json({ status: 'ok' }));
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    database: dbAvailable ? 'connected' : 'in-memory',
+    port: PORT
+  });
+});
+
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    database: dbAvailable ? 'connected' : 'in-memory',
+    port: PORT
+  });
+});
 
 app.post('/api/scan', upload.single('image'), async (req, res) => {
   try {
@@ -230,7 +246,13 @@ let userIdCounter = 1;
 let User, Scan, TextEntry, Advice, sequelize;
 let dbAvailable = false;
 
-if (!process.env.VERCEL) {
+// Initialize database if not on Vercel
+async function initDatabase() {
+  if (process.env.VERCEL) {
+    console.log('⚠️  Vercel environment - using in-memory storage');
+    return;
+  }
+  
   try {
     const db = require('./db');
     sequelize = db.sequelize;
@@ -239,26 +261,41 @@ if (!process.env.VERCEL) {
     TextEntry = db.TextEntry;
     Advice = db.Advice;
     
-    sequelize.sync().then(() => {
-      console.log('✅ Database connected and synced');
-      dbAvailable = true;
-    }).catch(err => {
-      console.warn('⚠️  Database unavailable, using in-memory storage');
-      dbAvailable = false;
-    });
+    await sequelize.sync();
+    dbAvailable = true;
+    console.log('✅ Database connected and synced');
   } catch (err) {
-    console.warn('⚠️  Database module not available, using in-memory storage');
+    console.warn('⚠️  Database unavailable, using in-memory storage:', err.message);
     dbAvailable = false;
   }
 }
 
-// For Vercel serverless
-if (process.env.VERCEL) {
-  module.exports = app;
-} else {
-  app.listen(PORT, () => {
-    console.log(`\n🚀 Server running on http://localhost:${PORT}`);
-    console.log(`📡 Python ML service: ${PY_SERVICE}`);
-    console.log(`💾 Database: ${dbAvailable ? 'Connected' : 'In-Memory Mode'}\n`);
-  });
+// Start server
+async function startServer() {
+  await initDatabase();
+  
+  if (process.env.VERCEL) {
+    module.exports = app;
+  } else {
+    const server = app.listen(PORT, '0.0.0.0', () => {
+      console.log(`\n🚀 Server running on http://0.0.0.0:${PORT}`);
+      console.log(`📡 Python ML service: ${PY_SERVICE}`);
+      console.log(`💾 Database: ${dbAvailable ? 'Connected (PostgreSQL)' : 'In-Memory Mode'}\n`);
+    });
+    
+    // Graceful shutdown
+    process.on('SIGTERM', () => {
+      console.log('SIGTERM received, closing server gracefully...');
+      server.close(() => {
+        console.log('Server closed');
+        if (sequelize) sequelize.close();
+        process.exit(0);
+      });
+    });
+  }
 }
+
+startServer().catch(err => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
+});
