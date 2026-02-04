@@ -59,34 +59,20 @@
             margin: 0 auto;
             background: white;
             border-radius: 50%;
-            padding: 30px;
+            padding: 20px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
+            overflow: hidden;
         }
 
-        .logo svg {
+        .logo img {
             width: 100%;
             height: 100%;
+            object-fit: cover;
         }
-
-        .head-silhouette {
-            fill: #3a4a5f;
-        }
-
-        .wave {
-            fill: none;
-            stroke-width: 12;
-            stroke-linecap: round;
-        }
-
-        .wave-1 { stroke: #ff6b9d; }
-        .wave-2 { stroke: #c945ff; }
-        .wave-3 { stroke: #4158d0; }
-        .wave-4 { stroke: #ff8c42; }
-        .wave-5 { stroke: #feca57; }
 
         h1 {
             font-size: 48px;
@@ -177,24 +163,7 @@
     <div class="container">
         <div class="logo-container">
             <div class="logo">
-                <svg viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Head silhouette -->
-                    <path class="head-silhouette" d="M100,40 C85,40 70,50 65,65 C60,80 60,100 60,120 C60,140 65,160 70,175 C75,190 85,200 100,200 C100,200 110,195 115,185 C120,175 125,160 130,140 C135,120 140,100 140,80 C140,60 130,45 115,40 C110,38 105,40 100,40 Z" />
-                    
-                    <!-- Colorful waves -->
-                    <path class="wave wave-1" d="M 65,80 Q 75,75 85,80" />
-                    <path class="wave wave-2" d="M 65,95 Q 80,88 95,95" />
-                    <path class="wave wave-3" d="M 65,110 Q 85,100 105,110" />
-                    <path class="wave wave-4" d="M 65,125 Q 90,112 115,125" />
-                    <path class="wave wave-5" d="M 70,140 Q 95,125 120,140" />
-                    
-                    <!-- Horizontal lines on the left -->
-                    <line class="wave wave-1" x1="45" y1="80" x2="60" y2="80" stroke-width="8" />
-                    <line class="wave wave-2" x1="50" y1="95" x2="60" y2="95" stroke-width="8" />
-                    <line class="wave wave-3" x1="45" y1="110" x2="60" y2="110" stroke-width="8" />
-                    <line class="wave wave-4" x1="50" y1="125" x2="60" y2="125" stroke-width="8" />
-                    <line class="wave wave-5" x1="45" y1="140" x2="65" y2="140" stroke-width="8" />
-                </svg>
+                <img src="images/fakoya-logo.png" alt="Fakoya AI Logo">
             </div>
         </div>
 
