@@ -3,93 +3,392 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Fakoya AI - Dashboard</title>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        /* Mobile-first header */
+        .mobile-header {
+            background: white;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .greeting {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .menu-toggle svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        /* Main content area */
+        .mobile-container {
+            padding: 32px 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Profile circle */
+        .profile-section {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .profile-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            margin: 0 auto 24px;
+            overflow: hidden;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+
+        .profile-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .help-text {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 32px;
+        }
+
+        /* Action cards grid */
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .action-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 32px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            min-height: 160px;
+        }
+
+        .action-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .action-icon {
+            width: 56px;
+            height: 56px;
+            background: #3d5a7f;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+        }
+
+        .action-card svg {
+            width: 32px;
+            height: 32px;
+            fill: white;
+        }
+
+        .action-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        /* Chat input area (bottom) */
+        .chat-input-area {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 16px 20px 24px;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+            display: none; /* Hidden by default, shown on chat page */
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 12px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 14px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 24px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input:focus {
+            border-color: #3b82f6;
+        }
+
+        .chat-send-btn {
+            width: 52px;
+            height: 52px;
+            background: #3d5a7f;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chat-send-btn:hover {
+            background: #2d4a6f;
+            transform: scale(1.05);
+        }
+
+        .chat-send-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        /* Mobile sidebar menu */
+        .mobile-sidebar {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 80%;
+            max-width: 320px;
+            height: 100vh;
+            background: white;
+            box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .mobile-sidebar.open {
+            right: 0;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .sidebar-user {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .sidebar-menu-list {
+            list-style: none;
+            padding: 16px 0;
+        }
+
+        .sidebar-menu-list li {
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .sidebar-menu-list a {
+            display: block;
+            padding: 16px 20px;
+            color: #2d3748;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .sidebar-menu-list a:hover {
+            background: #f8fafc;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 999;
+        }
+
+        .sidebar-overlay.show {
+            display: block;
+        }
+
+        @media (min-width: 768px) {
+            .action-grid {
+                grid-template-columns: repeat(2, 1fr);
+                max-width: 600px;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <div class="greeting">Hi <span id="userName">Obi</span>,</div>
+        <button class="menu-toggle" onclick="toggleMenu()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#2d3748" stroke-width="2">
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
+    </div>
 
-<div class="main-container">
+    <!-- Main Content -->
+    <div class="mobile-container">
+        <!-- Profile Section -->
+        <div class="profile-section">
+            <div class="profile-circle">
+                <img src="iages/logo.jpeg" alt="Profile" id="profileImage">
+            </div>
+            <div class="help-text">How can I help you today?</div>
+        </div>
 
-    <!-- LEFT SIDE (Sidebar) -->
-    <div class="left-section sidebar-menu">
-        <img src="images/profile-image.svg" class="logo" alt="Fakoya AI Logo">
+        <!-- Action Cards -->
+        <div class="action-grid">
+            <a href="scan.html" class="action-card">
+                <div class="action-icon">
+                    <svg viewBox="0 0 24 24" fill="white">
+                        <path d="M4 4h4v2H6v2H4V4zm0 12H6v2h2v2H4v-4zm12 0h2v4h-4v-2h2v-2zM18 4h-4V2h4c1.1 0 2 .9 2 2v4h-2V4zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    </svg>
+                </div>
+                <div class="action-label">Start a live scan</div>
+            </a>
 
-        <ul class="menu-list">
+            <a href="javascript:void(0)" onclick="showChatInput()" class="action-card">
+                <div class="action-icon">
+                    <svg viewBox="0 0 24 24" fill="white">
+                        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
+                        <path d="M7 9h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z"/>
+                    </svg>
+                </div>
+                <div class="action-label">Tell me how you feel</div>
+            </a>
+
+            <a href="history.html" class="action-card">
+                <div class="action-icon">
+                    <svg viewBox="0 0 24 24" fill="white">
+                        <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8z"/>
+                    </svg>
+                </div>
+                <div class="action-label">History</div>
+            </a>
+
+            <a href="settings.html" class="action-card">
+                <div class="action-icon">
+                    <svg viewBox="0 0 24 24" fill="white">
+                        <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94L14.4 2.81c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                    </svg>
+                </div>
+                <div class="action-label">Settings & Privacy</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Chat Input Area (hidden by default) -->
+    <div class="chat-input-area" id="chatInputArea">
+        <div class="chat-input-wrapper">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Tell me how you feel">
+            <button class="chat-send-btn" onclick="handleChatSend()">
+                <svg viewBox="0 0 24 24" fill="white">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Sidebar -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMenu()"></div>
+    <div class="mobile-sidebar" id="mobileSidebar">
+        <div class="sidebar-header">
+            <p class="sidebar-user">Signed in as <strong id="userEmail">—</strong></p>
+        </div>
+        <ul class="sidebar-menu-list">
             <li><a href="scan.html">Start a live scan</a></li>
-            <li><a href="settings.html">Settings</a></li>
             <li><a href="history.html">Your History</a></li>
+            <li><a href="settings.html">Settings & Privacy</a></li>
             <li><a href="#" onclick="logout();return false;">Logout</a></li>
         </ul>
-
-        <div class="user-panel">
-            <p>Signed in as <strong id="userEmail">—</strong></p>
-        </div>
     </div>
 
-    <!-- RIGHT SIDE -->
-    <div class="right-section">
-        <div class="page-header">
-            <a href="about.html" class="about-link">About Us</a>
-        </div>    
+    <script>
+        function toggleMenu() {
+            const sidebar = document.getElementById('mobileSidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+        }
 
-        <!-- Main content / text analysis area -->
-        <div class="main-area">
-            <div class="hero centered-hero">
-                <img src="images/logo22.svg" class="hero-image-large" alt="Hero">
-                <h1 class="hero-title">How are you feeling today?</h1>
-                <p class="hero-subtitle">Type how you feel or use the Live Scan to analyze your expression.</p>
+        function showChatInput() {
+            const chatArea = document.getElementById('chatInputArea');
+            chatArea.style.display = 'block';
+            document.getElementById('chatInput').focus();
+        }
 
-                <div class="hero-input">
-                    <input id="chatInput" class="hero-chat" type="text" placeholder="Tell me how you feel">
-                    <button id="chatSend" class="hero-send" onclick="handleChatSend()"><img src="images/arrow-icon.svg" alt="Send"></button>
-                </div>
-            </div>
+        // Initialize user name
+        const currentUser = localStorage.getItem('currentUser');
+        if (currentUser) {
+            document.getElementById('userEmail').textContent = currentUser;
+            // Extract first name
+            const firstName = currentUser.split('@')[0] || 'User';
+            document.getElementById('userName').textContent = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+        }
+    </script>
 
-            <div id="settingsPanel" class="panel" style="display:none;">
-                <h2 class="panel-title">Settings &amp; Privacy</h2>
-                <div class="panel-body">
-                    <label class="toggle-row">
-                        <input type="checkbox" id="settingAutoScan">
-                        <span>Auto-start live scan on Scan page</span>
-                    </label>
-                    <label class="toggle-row">
-                        <input type="checkbox" id="settingSaveHistory">
-                        <span>Save analysis history locally</span>
-                    </label>
-                    <label class="toggle-row">
-                        <input type="checkbox" id="settingShareData">
-                        <span>Allow sharing anonymized usage data</span>
-                    </label>
-                    <div class="panel-actions">
-                        <button class="create-btn" onclick="saveSettings()">Save Settings</button>
-                        <button class="create-btn secondary" onclick="clearLocalHistory()">Clear Local History</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="historyPanel" class="panel" style="display:none;">
-                <h2 class="panel-title">Your History</h2>
-                <div class="panel-body">
-                    <div class="panel-actions">
-                        <button class="create-btn" onclick="refreshHistory()">Refresh</button>
-                    </div>
-                    <div id="historyList" class="history-list"></div>
-                </div>
-            </div>
-
-        </div>
-
-
-
-    </div>
-
-</div>
-
-<!-- TensorFlow.js and MobileNet -->
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.20.0/dist/tf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
-<script src="js/sentiment.js"></script>
-<script src="js/app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.20.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
+    <script src="js/sentiment.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
