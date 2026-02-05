@@ -2,17 +2,15 @@
   "name": "godabeg",
   "version": "2.0.0",
   "description": "Emotion detection app with text analysis and live scan",
-  "main": "index.html",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "build": "mkdir -p public && cp -r *.html css js images iages public/",
-    "vercel-build": "echo 'Static site - no build needed'"
+    "build": "echo 'Building...'",
+    "postinstall": "echo 'Checking dependencies...'"
   },
   "dependencies": {
-    "@sequelize/sqlite3": "^7.0.0-alpha.48",
     "axios": "^1.4.0",
-    "better-sqlite3": "^12.6.2",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
     "express": "^4.18.2",
