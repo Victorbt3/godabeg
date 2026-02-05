@@ -989,3 +989,62 @@ body {
   object-fit: cover;
   border: 3px solid rgba(0,0,0,0.1);
 }
+.chat-input {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  display: flex;
+  background: #f5f5f5;
+  border-radius: 30px;
+  padding: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.chat-input input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 12px;
+  font-size: 15px;
+}
+
+.chat-input button {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  background: #334155;
+  color: #fff;
+  font-size: 18px;
+}
+.side-menu {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 220px;
+  height: 100%;
+  background: #0f172a;
+  padding-top: 80px;
+  display: flex;
+  flex-direction: column;
+  transition: right 0.3s ease;
+  z-index: 1200;
+}
+
+.side-menu a {
+  padding: 14px 20px;
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.side-menu a:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.side-menu.open {
+  right: 0;
+}
