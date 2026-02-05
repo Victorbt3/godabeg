@@ -9,10 +9,13 @@ let predicting = false;
 let predictInterval = null;
 
 async function createAccount() {
+    console.log('createAccount called');
     const nameInput = document.querySelector('input[placeholder="Your Name"]');
     const emailInput = document.querySelector('input[placeholder="Your Email"]');
     const passwordInput = document.querySelector('input[placeholder="Password"]');
     const confirmInput = document.querySelector('input[placeholder="Confirm Password"]');
+    
+    console.log('Inputs found:', {nameInput, emailInput, passwordInput, confirmInput});
     
     if (!nameInput || !emailInput || !passwordInput) {
         alert('Please fill in all fields');
@@ -23,6 +26,8 @@ async function createAccount() {
     const email = emailInput.value.trim().toLowerCase();
     const password = passwordInput.value;
     const confirm = confirmInput ? confirmInput.value : password;
+    
+    console.log('Values:', {name, email, password: '***', confirm: '***'});
     
     if (!name) {
         alert('Please enter your name');
@@ -44,6 +49,8 @@ async function createAccount() {
         return;
     }
     
+    console.log('Validation passed, trying server...');
+    
     // Try server first
     try {
         const response = await fetch('/api/register', {
@@ -52,7 +59,9 @@ async function createAccount() {
             body: JSON.stringify({ name, email, password })
         });
         
+        console.log('Server response status:', response.status);
         const data = await response.json();
+        console.log('Server response data:', data);
         
         if (response.ok) {
             // Save to localStorage as backup
@@ -61,36 +70,43 @@ async function createAccount() {
             localStorage.setItem('accounts', JSON.stringify(accounts));
             
             alert('✅ Account created successfully! Please log in.');
-            window.location = 'login.html';
+            window.location.href = 'login.html';
             return;
         }
         
         if (data.error === 'email_exists') {
             alert('This email is already registered. Please log in instead.');
-            window.location = 'login.html';
+            window.location.href = 'login.html';
             return;
         }
+        
+        alert('Error: ' + (data.message || data.error || 'Unknown error'));
+        return;
     } catch (err) {
-        console.log('Server unavailable, using offline mode');
+        console.error('Server error:', err);
+        console.log('Using offline mode');
     }
     
     // Fallback to localStorage
     const accounts = JSON.parse(localStorage.getItem('accounts') || '{}');
     if (accounts[email]) {
         alert('This email is already registered. Please log in instead.');
-        window.location = 'login.html';
+        window.location.href = 'login.html';
         return;
     }
     
     accounts[email] = { name, email, password, createdAt: new Date().toISOString() };
     localStorage.setItem('accounts', JSON.stringify(accounts));
     alert('✅ Account created successfully! Please log in.');
-    window.location = 'login.html';
+    window.location.href = 'login.html';
 }
 
 async function loginUser() {
+    console.log('loginUser called');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
+    
+    console.log('Inputs found:', {emailInput, passwordInput});
     
     if (!emailInput || !passwordInput) {
         alert('Please fill in all fields');
@@ -100,10 +116,14 @@ async function loginUser() {
     const email = emailInput.value.trim().toLowerCase();
     const password = passwordInput.value;
     
+    console.log('Email:', email, 'Password length:', password.length);
+    
     if (!email || !password) {
         alert('Please enter both email and password');
         return;
     }
+    
+    console.log('Trying server login...');
     
     // Try server first
     try {
@@ -113,8 +133,11 @@ async function loginUser() {
             body: JSON.stringify({ email, password })
         });
         
+        console.log('Server response status:', response.status);
+        
         if (response.ok) {
             const user = await response.json();
+            console.log('Login successful:', user);
             localStorage.setItem('currentUser', email);
             localStorage.setItem('userName', user.name || email);
             localStorage.setItem('userId', user.id);
@@ -124,10 +147,17 @@ async function loginUser() {
             accounts[email] = { name: user.name, email, password };
             localStorage.setItem('accounts', JSON.stringify(accounts));
             
-            window.location = 'home.html';
+            console.log('Redirecting to home.html...');
+            window.location.href = 'home.html';
             return;
+        } else {
+            const error = await response.json();
+            console.error('Login failed:', error);
         }
     } catch (err) {
+        console.error('Server error:', err);
+        console.log('Using offline mode');
+    }
         console.log('Server unavailable, using offline mode');
     }
     
