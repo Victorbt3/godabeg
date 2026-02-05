@@ -976,3 +976,16 @@ body {
   font-size: 22px;
   cursor: pointer;
 }
+.ai-container {
+  margin-top: 120px;
+  display: flex;
+  justify-content: center;
+}
+
+.ai-container img {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(0,0,0,0.1);
+}
