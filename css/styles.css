@@ -875,3 +875,109 @@ body {
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
+/* =========================
+   MOBILE HOME PAGE LAYOUT
+   ========================= */
+@media (max-width: 768px) {
+
+  /* Hide sidebar */
+  .left-section {
+    display: none;
+  }
+
+  /* Main container becomes single column */
+  .main-container {
+    flex-direction: column;
+  }
+
+  .right-section {
+    width: 100%;
+    padding-bottom: 70px; /* space for bottom nav */
+  }
+
+  /* Header becomes compact */
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+  }
+
+  .about-link {
+    font-size: 14px;
+  }
+
+  /* Hero section */
+  .centered-hero {
+    padding: 20px 16px;
+    text-align: center;
+  }
+
+  .hero-image-large {
+    width: 120px;
+    height: auto;
+    margin-bottom: 16px;
+  }
+
+  .hero-title {
+    font-size: 22px;
+    line-height: 1.3;
+  }
+
+  .hero-subtitle {
+    font-size: 14px;
+    opacity: 0.8;
+    margin-bottom: 20px;
+  }
+
+  /* Chat input */
+  .hero-input {
+    display: flex;
+    gap: 10px;
+  }
+
+  .hero-chat {
+    flex: 1;
+    font-size: 14px;
+    padding: 12px;
+  }
+
+  .hero-send {
+    width: 44px;
+    height: 44px;
+  }
+
+  /* Panels full width */
+  .panel {
+    margin: 0;
+    border-radius: 0;
+  }
+}
+/* Mobile bottom navigation */
+@media (max-width: 768px) {
+  .mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: #0f172a;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1000;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .mobile-nav a {
+    color: #fff;
+    font-size: 13px;
+    text-decoration: none;
+    opacity: 0.85;
+  }
+
+  .mobile-nav a:hover {
+    opacity: 1;
+  }
+}
+
