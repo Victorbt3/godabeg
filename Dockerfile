@@ -1,7 +1,7 @@
 # Node app Dockerfile - High Compatibility for Railway
 FROM node:18-bullseye
 
-# Install build tools in case sqlite3 or other native modules need to compile
+# Install build tools for native modules (like sqlite3)
 RUN apt-get update && apt-get install -y \
     python3 \
     make \
@@ -13,19 +13,14 @@ WORKDIR /app
 # Copy dependency files
 COPY package*.json ./
 
-# Install ALL dependencies (including dev) to ensure build tools are available
-# but use --build-from-source for native modules if needed
+# Install dependencies
 RUN npm install
 
 # Copy the rest of the application
 COPY . .
 
-# Set production environment
+# IMPORTANT: Remove hardcoded PORT=3000 to let Railway inject its own
 ENV NODE_ENV=production
-ENV PORT=3000
-
-# Expose the port
-EXPOSE 3000
 
 # Start command
 CMD ["node", "server.js"]

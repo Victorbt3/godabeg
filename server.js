@@ -23,8 +23,16 @@ app.use(express.static(path.join(__dirname)));
 const PORT = process.env.PORT || 3000;
 const PY_SERVICE = process.env.PY_SERVICE_URL || 'http://localhost:8000';
 
+console.log('--- Startup Parameters ---');
+console.log('Target Port:', PORT);
+console.log('Node Env:', process.env.NODE_ENV);
+console.log('Database URL Present:', !!process.env.DATABASE_URL);
+
 // use memory storage so we can forward buffer directly
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } }); // 5MB limit
+
+// Simple health check for Railway
+app.get('/railway-health', (req, res) => res.status(200).send('OK'));
 
 // Root route to serve index.html
 app.get('/', (req, res) => {
