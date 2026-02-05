@@ -9,3 +9,5 @@ __pycache__
 .env
 .DS_Store
 godabeg-deploy.zip
+database.sqlite
+database.sqlite-journal

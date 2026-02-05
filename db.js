@@ -1,20 +1,30 @@
 // db.js
-// Sequelize setup for PostgreSQL
+// Sequelize setup for PostgreSQL (production) or SQLite (local)
 const { Sequelize, DataTypes } = require('sequelize');
 
-// Handle DATABASE_URL for both local and production
-const dbUrl = process.env.DATABASE_URL || 'postgres://godabeguser:godabegpass@localhost:5432/godabeg';
+// Use PostgreSQL for production (Railway), SQLite for local development
+let sequelize;
 
-const sequelize = new Sequelize(dbUrl, {
-  dialect: 'postgres',
-  logging: false,
-  dialectOptions: process.env.NODE_ENV === 'production' ? {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false
+if (process.env.DATABASE_URL) {
+  // Production: PostgreSQL (Railway auto-provides this)
+  sequelize = new Sequelize(process.env.DATABASE_URL, {
+    dialect: 'postgres',
+    logging: false,
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false
+      }
     }
-  } : {}
-});
+  });
+} else {
+  // Local development: SQLite (no setup required!)
+  sequelize = new Sequelize({
+    dialect: 'sqlite',
+    storage: './database.sqlite',
+    logging: false
+  });
+}
 
 const User = sequelize.define('User', {
   email: { type: DataTypes.STRING, unique: true, allowNull: false },
