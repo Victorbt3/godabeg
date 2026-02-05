@@ -7,8 +7,6 @@ cmds = ['npm install']
 [start]
 cmd = 'node server.js'
 
-[healthcheck]
-path = '/health'
-interval = 30
-timeout = 10
-retries = 3
+[static]
+# Empty static phase to ensure nixpacks doesn't try to be too smart
+

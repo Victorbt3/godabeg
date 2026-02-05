@@ -4,6 +4,10 @@ console.log('Node Version:', process.version);
 console.log('Environment:', process.env.NODE_ENV);
 console.log('Port Configured:', process.env.PORT);
 
+// CRITICAL: Ensure we bind to 0.0.0.0 for Railway
+const PORT = process.env.PORT || 3000;
+const HOST = '0.0.0.0';
+
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
@@ -16,22 +20,9 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json()); // Parse JSON request bodies
 
-// serve frontend files (home.html, scan.html, css, js, etc.) from project root
-const path = require('path');
-app.use(express.static(path.join(__dirname)));
+// --- Health Checks (CRITICAL for Deployment) ---
+app.get('/favicon.ico', (req, res) => res.status(204).end());
 
-const PORT = process.env.PORT || 3000;
-const PY_SERVICE = process.env.PY_SERVICE_URL || 'http://localhost:8000';
-
-console.log('--- Startup Parameters ---');
-console.log('Target Port:', PORT);
-console.log('Node Env:', process.env.NODE_ENV);
-console.log('Database URL Present:', !!process.env.DATABASE_URL);
-
-// use memory storage so we can forward buffer directly
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } }); // 5MB limit
-
-// Simple health check for Railway
 app.get('/railway-health', (req, res) => {
   console.log('Health check received');
   res.status(200).send('OK');
@@ -56,6 +47,21 @@ app.get('/api/health', (req, res) => {
     port: PORT
   });
 });
+
+// serve frontend files (home.html, scan.html, css, js, etc.) from project root
+const path = require('path');
+app.use(express.static(path.join(__dirname)));
+
+const PY_SERVICE = process.env.PY_SERVICE_URL || 'http://localhost:8000';
+
+console.log('--- Startup Parameters ---');
+console.log('Target Port:', PORT);
+console.log('Node Env:', process.env.NODE_ENV);
+console.log('Database URL Present:', !!process.env.DATABASE_URL);
+
+// use memory storage so we can forward buffer directly
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } }); // 5MB limit
+
 
 // Root route to serve index.html
 app.get('/', (req, res) => {
@@ -325,15 +331,15 @@ async function initDatabase() {
 // Start server
 async function startServer() {
   // Start the server FIRST so Railway sees us as "responding"
-  const server = app.listen(PORT, '0.0.0.0', () => {
-    console.log(`\n🚀 Server is UP and listening on port ${PORT}`);
+  const server = app.listen(PORT, HOST, () => {
+    console.log(`\n🚀 Server is UP and listening on http://${HOST}:${PORT}`);
     console.log(`📡 Expecting Python ML service at: ${PY_SERVICE}\n`);
   });
 
   // Then initialize database in the background
   try {
     await initDatabase();
-    console.log(`💾 Database Status: ${dbAvailable ? 'Connected (PostgreSQL)' : 'In-Memory Mode'}\n`);
+    console.log(`💾 Database Status: ${dbAvailable ? 'Connected' : 'In-Memory Mode'} (SQLite/Postgres logic in db.js)\n`);
   } catch (err) {
     console.error('Database initialization failed:', err);
   }
