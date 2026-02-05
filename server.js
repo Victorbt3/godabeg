@@ -32,15 +32,14 @@ console.log('Database URL Present:', !!process.env.DATABASE_URL);
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } }); // 5MB limit
 
 // Simple health check for Railway
-app.get('/railway-health', (req, res) => res.status(200).send('OK'));
-
-// Root route to serve index.html
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+app.get('/railway-health', (req, res) => {
+  console.log('Health check received');
+  res.status(200).send('OK');
 });
 
 app.get('/health', (req, res) => {
-  res.json({ 
+  console.log('Health check /health received');
+  res.status(200).json({ 
     status: 'ok',
     timestamp: new Date().toISOString(),
     database: dbAvailable ? 'connected' : 'in-memory',
@@ -49,12 +48,18 @@ app.get('/health', (req, res) => {
 });
 
 app.get('/api/health', (req, res) => {
+  console.log('Health check /api/health received');
   res.json({ 
     status: 'ok',
     timestamp: new Date().toISOString(),
     database: dbAvailable ? 'connected' : 'in-memory',
     port: PORT
   });
+});
+
+// Root route to serve index.html
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.post('/api/scan', upload.single('image'), async (req, res) => {

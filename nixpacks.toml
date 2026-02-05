@@ -1,0 +1,14 @@
+[phases.setup]
+nixPkgs = ['nodejs-18_x']
+
+[phases.install]
+cmds = ['npm install']
+
+[start]
+cmd = 'node server.js'
+
+[healthcheck]
+path = '/health'
+interval = 30
+timeout = 10
+retries = 3
