@@ -311,30 +311,37 @@ async function initDatabase() {
 
 // Start server
 async function startServer() {
-  await initDatabase();
+  // Start the server FIRST so Railway sees us as "responding"
+  const server = app.listen(PORT, '0.0.0.0', () => {
+    console.log(`\n🚀 Server is UP and listening on port ${PORT}`);
+    console.log(`📡 Expecting Python ML service at: ${PY_SERVICE}\n`);
+  });
+
+  // Then initialize database in the background
+  try {
+    await initDatabase();
+    console.log(`💾 Database Status: ${dbAvailable ? 'Connected (PostgreSQL)' : 'In-Memory Mode'}\n`);
+  } catch (err) {
+    console.error('Database initialization failed:', err);
+  }
   
+  // Handle Vercel separately if needed
   if (process.env.VERCEL) {
     module.exports = app;
-  } else {
-    const server = app.listen(PORT, '0.0.0.0', () => {
-      console.log(`\n🚀 Server running on http://0.0.0.0:${PORT}`);
-      console.log(`📡 Python ML service: ${PY_SERVICE}`);
-      console.log(`💾 Database: ${dbAvailable ? 'Connected (PostgreSQL)' : 'In-Memory Mode'}\n`);
-    });
-    
-    // Graceful shutdown
-    process.on('SIGTERM', () => {
-      console.log('SIGTERM received, closing server gracefully...');
-      server.close(() => {
-        console.log('Server closed');
-        if (sequelize) sequelize.close();
-        process.exit(0);
-      });
-    });
   }
+
+  // Graceful shutdown
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM received, closing server gracefully...');
+    server.close(() => {
+      console.log('Server closed');
+      if (typeof sequelize !== 'undefined' && sequelize) sequelize.close();
+      process.exit(0);
+    });
+  });
 }
 
 startServer().catch(err => {
-  console.error('Failed to start server:', err);
+  console.error('FATAL: Failed to start the server process:', err);
   process.exit(1);
 });
