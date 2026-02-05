@@ -2,6 +2,23 @@
 // --- AUTH ---
 let currentUser = null;
 let dataset = []; // {label, dataUrl}
+
+// Ping server to check connectivity
+async function checkServer() {
+    if (window.location.protocol === 'file:') {
+        alert('⚠️ Warning: You are opening this file directly. Please run the server and visit http://localhost:3000 instead.');
+        return;
+    }
+    try {
+        const resp = await fetch('/api/health');
+        const data = await resp.json();
+        console.log('✅ Server Connection:', data.status, 'DB:', data.database);
+    } catch (e) {
+        console.warn('⚠️ Server unavailable, working in offline mode.');
+    }
+}
+checkServer();
+
 let labels = [];
 let net = null; // mobilenet
 let classifier = null; // tf model
@@ -10,103 +27,112 @@ let predictInterval = null;
 
 async function createAccount() {
     console.log('createAccount called');
-    
-    // Try both querySelector and getElementById
-    let nameInput = document.getElementById('name');
-    let emailInput = document.getElementById('signupEmail');
-    let passwordInput = document.getElementById('signupPassword');
-    let confirmInput = document.getElementById('confirmPassword');
-    
-    // Fallback to querySelector if IDs not found
-    if (!nameInput) nameInput = document.querySelector('input[placeholder="Your Name"]');
-    if (!emailInput) emailInput = document.querySelector('input[placeholder="Your Email"]');
-    if (!passwordInput) passwordInput = document.querySelector('input[placeholder="Password"]');
-    if (!confirmInput) confirmInput = document.querySelector('input[placeholder="Confirm Password"]');
-    
-    console.log('Inputs found:', {nameInput, emailInput, passwordInput, confirmInput});
-    
-    if (!nameInput || !emailInput || !passwordInput) {
-        alert('Please fill in all fields');
-        return;
+    const signupBtn = document.querySelector('.create-btn');
+    if (signupBtn) {
+        signupBtn.disabled = true;
+        signupBtn.innerText = 'Creating Account...';
     }
     
-    const name = nameInput.value.trim();
-    const email = emailInput.value.trim().toLowerCase();
-    const password = passwordInput.value;
-    const confirm = confirmInput ? confirmInput.value : password;
-    
-    console.log('Values:', {name, email, password: '***', confirm: '***'});
-    
-    if (!name) {
-        alert('Please enter your name');
-        return;
-    }
-    
-    if (!email || !email.includes('@')) {
-        alert('Please enter a valid email address');
-        return;
-    }
-    
-    if (!password || password.length < 4) {
-        alert('Password must be at least 4 characters');
-        return;
-    }
-    
-    if (password !== confirm) {
-        alert('Passwords do not match');
-        return;
-    }
-    
-    console.log('Validation passed, trying server...');
-    
-    // Try server first
     try {
-        const response = await fetch('/api/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password })
-        });
+        // Try both querySelector and getElementById
+        let nameInput = document.getElementById('name');
+        let emailInput = document.getElementById('signupEmail');
+        let passwordInput = document.getElementById('signupPassword');
+        let confirmInput = document.getElementById('confirmPassword');
         
-        console.log('Server response status:', response.status);
-        const data = await response.json();
-        console.log('Server response data:', data);
+        // Fallback to querySelector if IDs not found
+        if (!nameInput) nameInput = document.querySelector('input[placeholder="Your Name"]');
+        if (!emailInput) emailInput = document.querySelector('input[placeholder="Your Email"]');
+        if (!passwordInput) passwordInput = document.querySelector('input[placeholder="Password"]');
+        if (!confirmInput) confirmInput = document.querySelector('input[placeholder="Confirm Password"]');
         
-        if (response.ok) {
-            // Save to localStorage as backup
-            const accounts = JSON.parse(localStorage.getItem('accounts') || '{}');
-            accounts[email] = { name, email, password, createdAt: new Date().toISOString() };
-            localStorage.setItem('accounts', JSON.stringify(accounts));
-            
-            alert('✅ Account created successfully! Please log in.');
-            window.location.href = 'login.html';
+        console.log('Inputs found:', {nameInput, emailInput, passwordInput, confirmInput});
+        
+        if (!nameInput || !emailInput || !passwordInput) {
+            alert('Please fill in all fields');
             return;
         }
         
-        if (data.error === 'email_exists') {
+        const name = nameInput.value.trim();
+        const email = emailInput.value.trim().toLowerCase();
+        const password = passwordInput.value;
+        const confirm = confirmInput ? confirmInput.value : password;
+        
+        if (!name || !email || !password) {
+            alert('Please fill in all fields');
+            return;
+        }
+        
+        if (!email.includes('@')) {
+            alert('Please enter a valid email address');
+            return;
+        }
+        
+        if (password.length < 4) {
+            alert('Password must be at least 4 characters');
+            return;
+        }
+        
+        if (password !== confirm) {
+            alert('Passwords do not match');
+            return;
+        }
+        
+        console.log('Validation passed, trying server register...');
+        
+        // Try server first
+        try {
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, password })
+            });
+            
+            console.log('Server response status:', response.status);
+            const data = await response.json();
+            
+            if (response.ok) {
+                // Save to localStorage as backup
+                const accounts = JSON.parse(localStorage.getItem('accounts') || '{}');
+                accounts[email] = { name, email, password, createdAt: new Date().toISOString() };
+                localStorage.setItem('accounts', JSON.stringify(accounts));
+                
+                alert('✅ Account created successfully! Please log in.');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            if (data.error === 'email_exists' || response.status === 409) {
+                alert('This email is already registered. Please log in instead.');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            alert('Error: ' + (data.message || data.error || 'Unknown error'));
+            return;
+        } catch (err) {
+            console.error('Server error during registration:', err);
+            console.log('Using offline mode');
+        }
+        
+        // Fallback to localStorage
+        const accounts = JSON.parse(localStorage.getItem('accounts') || '{}');
+        if (accounts[email]) {
             alert('This email is already registered. Please log in instead.');
             window.location.href = 'login.html';
             return;
         }
         
-        alert('Error: ' + (data.message || data.error || 'Unknown error'));
-        return;
-    } catch (err) {
-        console.error('Server error:', err);
-        console.log('Using offline mode');
-    }
-    
-    // Fallback to localStorage
-    const accounts = JSON.parse(localStorage.getItem('accounts') || '{}');
-    if (accounts[email]) {
-        alert('This email is already registered. Please log in instead.');
+        accounts[email] = { name, email, password, createdAt: new Date().toISOString() };
+        localStorage.setItem('accounts', JSON.stringify(accounts));
+        alert('✅ Account created (Offline Mode)! Please log in.');
         window.location.href = 'login.html';
-        return;
+    } finally {
+        if (signupBtn) {
+            signupBtn.disabled = false;
+            signupBtn.innerText = 'Create Account';
+        }
     }
-    
-    accounts[email] = { name, email, password, createdAt: new Date().toISOString() };
-    localStorage.setItem('accounts', JSON.stringify(accounts));
-    alert('✅ Account created successfully! Please log in.');
-    window.location.href = 'login.html';
 }
 
 async function loginUser() {
@@ -159,23 +185,27 @@ async function loginUser() {
             window.location.href = 'home.html';
             return;
         } else {
-            const error = await response.json();
-            console.error('Login failed:', error);
+            const errorData = await response.json();
+            console.error('Login failed:', errorData);
+            if (response.status === 401) {
+                alert('❌ Invalid email or password.');
+                return;
+            }
         }
     } catch (err) {
-        console.error('Server error:', err);
-        console.log('Using offline mode');
-    }
-        console.log('Server unavailable, using offline mode');
+        console.error('Server error during login:', err);
+        console.log('Attempting offline fallback...');
     }
     
     // Fallback to localStorage
     const accounts = JSON.parse(localStorage.getItem('accounts') || '{}');
+    console.log('Checking local accounts for:', email);
     
     if (accounts[email] && accounts[email].password === password) {
         localStorage.setItem('currentUser', email);
         localStorage.setItem('userName', accounts[email].name || email);
-        window.location = 'home.html';
+        console.log('Local login successful, redirecting...');
+        window.location.href = 'home.html';
     } else {
         alert('❌ Invalid email or password. Please try again or create an account.');
     }
@@ -261,18 +291,8 @@ function initHistoryPage() {
     refreshHistory();
 }
 
-function initCreateAccountPage() {
-    const btn = document.querySelector('.create-btn');
-    if (btn && document.title.includes('Create')) {
-        btn.addEventListener('click', createAccount);
-    }
-}
-
 if (document.title.includes('Dashboard') || document.title.includes('Live Scan')) {
     window.addEventListener('load', initHome);
-}
-if (document.title.includes('Create Account')) {
-    window.addEventListener('load', initCreateAccountPage);
 }
 if (document.title.includes('Settings')) {
     window.addEventListener('load', initSettingsPage);
@@ -582,11 +602,12 @@ async function showScanResult(res){
     const adviceText = getAdviceForMood(res.label || 'unknown');
 
     // Save scan result to backend
+    const userId = localStorage.getItem('userId') || 1;
     if (res && res.label && typeof res.confidence !== 'undefined') {
-        const savedScan = await saveScanResult(1, '', res.label, res.confidence);
+        const savedScan = await saveScanResult(userId, '', res.label, res.confidence);
         savePredictionHistory('Scan', res.label, res.confidence, '', adviceText);
         if (savedScan && savedScan.id) {
-            await saveAdviceRecord(1, savedScan.id, null, adviceText);
+            await saveAdviceRecord(userId, savedScan.id, null, adviceText);
         }
     }
 
@@ -689,10 +710,10 @@ async function predictFaceRemote(img) {
             throw new Error(`Server responded with ${response.status}: ${response.statusText}`);
         }
         
-        const data = await response.json();
+        const resultData = await response.json();
         
-        if (data.error) {
-            console.error('API returned error:', data.error);
+        if (resultData.error) {
+            console.error('API returned error:', resultData.error);
             // Use fallback
             console.warn('Backend unavailable, using fallback prediction');
             const emotions = ['happy', 'neutral', 'sad', 'surprised'];
@@ -709,24 +730,16 @@ async function predictFaceRemote(img) {
             };
         }
         
-        const data = await response.json();
-        
-        if (data.error) {
-            console.error('API returned error:', data.error);
-            // Use fallback
-            throw new Error(data.error);
-        }
-        
         // Ensure result has the correct format
         return {
-            label: data.emotion || data.label || 'neutral',
-            confidence: data.confidence || 0.75,
-            emotion: data.emotion || data.label || 'neutral',
-            happy: data.happy || 0,
-            neutral: data.neutral || 0,
-            surprise: data.surprise || 0,
-            bbox: data.bbox || null,
-            fallback: data.fallback || false
+            label: resultData.emotion || resultData.label || 'neutral',
+            confidence: resultData.confidence || 0.75,
+            emotion: resultData.emotion || resultData.label || 'neutral',
+            happy: resultData.happy || 0,
+            neutral: resultData.neutral || 0,
+            surprise: resultData.surprise || 0,
+            bbox: resultData.bbox || null,
+            fallback: resultData.fallback || false
         };
     } catch (err) {
         console.error('Face prediction error:', err.message);
@@ -989,6 +1002,22 @@ async function handleChatSend() {
         
         const advice = getAdviceForMood(result.emotion || 'unknown');
         savePredictionHistory('Text', result.emotion, result.confidence, text, advice);
+        
+        // Save to backend
+        const userId = localStorage.getItem('userId') || 1;
+        try {
+            const resp = await fetch('/api/save_text', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, text, emotion: result.emotion, confidence: result.confidence })
+            });
+            if (resp.ok) {
+                const savedText = await resp.json();
+                await saveAdviceRecord(userId, null, savedText.id, advice);
+            }
+        } catch (e) {
+            console.warn('Failed to save text entry to backend:', e);
+        }
 
         // Redirect to result page with emotion data
         const params = new URLSearchParams({

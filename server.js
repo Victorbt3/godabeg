@@ -132,57 +132,91 @@ app.post('/save_text_entry', express.json(), async (req, res) => {
   }
 });
 
-// --- User Registration ---
+// --- User Auth System ---
+
 app.post('/api/register', express.json(), async (req, res) => {
   const { email, password, name } = req.body;
-  if (!email || !password) return res.status(400).json({ error: 'missing_fields' });
-  
+  console.log(`[Auth] Registration attempt for: ${email}`);
+
+  if (!email || !password) {
+    return res.status(400).json({ success: false, error: 'Email and password are required' });
+  }
+
+  const normalizedEmail = email.toLowerCase().trim();
+
   try {
     if (dbAvailable && User) {
-      const user = await User.create({ email, password, name });
-      return res.json({ id: user.id, email: user.email, name: user.name });
-    } else {
-      // In-memory storage
-      if (users.has(email.toLowerCase())) {
-        return res.status(409).json({ error: 'email_exists' });
+      // Create user in database
+      const existingUser = await User.findOne({ where: { email: normalizedEmail } });
+      if (existingUser) {
+        return res.status(409).json({ success: false, error: 'email_exists' });
       }
-      const user = { 
-        id: userIdCounter++, 
-        email: email.toLowerCase(), 
-        password, 
-        name: name || email.split('@')[0] 
+
+      const user = await User.create({
+        email: normalizedEmail,
+        password: password, // Simple string for now, as per user's setup
+        name: name || normalizedEmail.split('@')[0]
+      });
+
+      console.log(`[Auth] User registered in DB: ${user.email} (ID: ${user.id})`);
+      return res.status(201).json({ success: true, id: user.id, email: user.email, name: user.name });
+    } else {
+      // In-memory fallback
+      if (users.has(normalizedEmail)) {
+        return res.status(409).json({ success: false, error: 'email_exists' });
+      }
+
+      const user = {
+        id: userIdCounter++,
+        email: normalizedEmail,
+        password,
+        name: name || normalizedEmail.split('@')[0]
       };
-      users.set(email.toLowerCase(), user);
-      return res.json({ id: user.id, email: user.email, name: user.name });
+
+      users.set(normalizedEmail, user);
+      console.log(`[Auth] User registered in memory: ${user.email}`);
+      return res.status(201).json({ success: true, id: user.id, email: user.email, name: user.name });
     }
-  } catch (e) {
-    if (e.name === 'SequelizeUniqueConstraintError') {
-      return res.status(409).json({ error: 'email_exists' });
-    }
-    return res.status(500).json({ error: 'db_error', message: e.message });
+  } catch (err) {
+    console.error(`[Auth] Registration error:`, err);
+    return res.status(500).json({ success: false, error: 'server_error', message: err.message });
   }
 });
 
-// --- User Login ---
 app.post('/api/login', express.json(), async (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) return res.status(400).json({ error: 'missing_fields' });
-  
+  console.log(`[Auth] Login attempt for: ${email}`);
+
+  if (!email || !password) {
+    return res.status(400).json({ success: false, error: 'Email and password are required' });
+  }
+
+  const normalizedEmail = email.toLowerCase().trim();
+
   try {
     if (dbAvailable && User) {
-      const user = await User.findOne({ where: { email, password } });
-      if (!user) return res.status(401).json({ error: 'invalid_credentials' });
-      return res.json({ id: user.id, email: user.email, name: user.name });
-    } else {
-      // In-memory storage
-      const user = users.get(email.toLowerCase());
-      if (!user || user.password !== password) {
-        return res.status(401).json({ error: 'invalid_credentials' });
+      const user = await User.findOne({ where: { email: normalizedEmail, password: password } });
+      if (!user) {
+        console.log(`[Auth] Login failed for: ${normalizedEmail}`);
+        return res.status(401).json({ success: false, error: 'invalid_credentials' });
       }
-      return res.json({ id: user.id, email: user.email, name: user.name });
+
+      console.log(`[Auth] Login successful for: ${user.email}`);
+      return res.json({ success: true, id: user.id, email: user.email, name: user.name });
+    } else {
+      // In-memory fallback
+      const user = users.get(normalizedEmail);
+      if (!user || user.password !== password) {
+        console.log(`[Auth] Login failed for: ${normalizedEmail} (Memory)`);
+        return res.status(401).json({ success: false, error: 'invalid_credentials' });
+      }
+
+      console.log(`[Auth] Login successful for: ${user.email} (Memory)`);
+      return res.json({ success: true, id: user.id, email: user.email, name: user.name });
     }
-  } catch (e) {
-    return res.status(500).json({ error: 'server_error', message: e.message });
+  } catch (err) {
+    console.error(`[Auth] Login error:`, err);
+    return res.status(500).json({ success: false, error: 'server_error', message: err.message });
   }
 });
 
