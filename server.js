@@ -1,4 +1,9 @@
 require('dotenv').config();
+console.log('--- Server Booting ---');
+console.log('Node Version:', process.version);
+console.log('Environment:', process.env.NODE_ENV);
+console.log('Port Configured:', process.env.PORT);
+
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
