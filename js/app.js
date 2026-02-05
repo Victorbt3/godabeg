@@ -223,8 +223,27 @@ function initUserContext() {
         window.location = 'login.html';
         return false;
     }
-    const el = document.getElementById('userEmail');
-    if (el) el.innerText = currentUser;
+    
+    // Set email in panel
+    const emailEl = document.getElementById('userEmail');
+    if (emailEl) emailEl.innerText = currentUser;
+    
+    // Set name in sidebar profile area
+    const nameEl = document.getElementById('userProfileName');
+    if (nameEl) {
+        const name = localStorage.getItem('userName') || currentUser.split('@')[0];
+        // Shorten to initials (e.g. "John Doe" -> "JD")
+        const words = name.split(' ');
+        let initials = "";
+        if (words.length > 1) {
+            initials = words[0][0] + words[1][0];
+        } else {
+            initials = name.slice(0, 2);
+        }
+        nameEl.innerText = initials.toUpperCase();
+        nameEl.title = name; // Show full name on hover
+    }
+    
     return true;
 }
 
