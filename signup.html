@@ -25,22 +25,22 @@
 
             <div class="input-box">
                 <span class="icon">👤</span>
-                <input type="text" placeholder="Your Name">
+                <input id="name" type="text" placeholder="Your Name">
             </div>
 
             <div class="input-box">
                 <span class="icon">✉️</span>
-                <input type="email" placeholder="Your Email">
+                <input id="signupEmail" type="email" placeholder="Your Email">
             </div>
 
             <div class="input-box">
                 <span class="icon">🔒</span>
-                <input type="password" placeholder="Password">
+                <input id="signupPassword" type="password" placeholder="Password">
             </div>
 
             <div class="input-box">
                 <span class="icon">🔒</span>
-                <input type="password" placeholder="Confirm Password">
+                <input id="confirmPassword" type="password" placeholder="Confirm Password" onkeypress="if(event.key==='Enter') createAccount()">
             </div>
 
             <button class="create-btn" onclick="createAccount()">Create Account</button>

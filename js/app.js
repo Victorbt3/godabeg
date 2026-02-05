@@ -10,10 +10,18 @@ let predictInterval = null;
 
 async function createAccount() {
     console.log('createAccount called');
-    const nameInput = document.querySelector('input[placeholder="Your Name"]');
-    const emailInput = document.querySelector('input[placeholder="Your Email"]');
-    const passwordInput = document.querySelector('input[placeholder="Password"]');
-    const confirmInput = document.querySelector('input[placeholder="Confirm Password"]');
+    
+    // Try both querySelector and getElementById
+    let nameInput = document.getElementById('name');
+    let emailInput = document.getElementById('signupEmail');
+    let passwordInput = document.getElementById('signupPassword');
+    let confirmInput = document.getElementById('confirmPassword');
+    
+    // Fallback to querySelector if IDs not found
+    if (!nameInput) nameInput = document.querySelector('input[placeholder="Your Name"]');
+    if (!emailInput) emailInput = document.querySelector('input[placeholder="Your Email"]');
+    if (!passwordInput) passwordInput = document.querySelector('input[placeholder="Password"]');
+    if (!confirmInput) confirmInput = document.querySelector('input[placeholder="Confirm Password"]');
     
     console.log('Inputs found:', {nameInput, emailInput, passwordInput, confirmInput});
     

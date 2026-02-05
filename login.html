@@ -25,12 +25,12 @@
 
             <div class="input-box">
                 <span class="icon">✉️</span>
-                <input id="email" type="email" placeholder="Your Email">
+                <input id="email" type="email" placeholder="Your Email" onkeypress="if(event.key==='Enter') loginUser()">
             </div>
 
             <div class="input-box">
                 <span class="icon">🔒</span>
-                <input id="password" type="password" placeholder="Password">
+                <input id="password" type="password" placeholder="Password" onkeypress="if(event.key==='Enter') loginUser()">
             </div>
 
             <button class="create-btn" onclick="loginUser()">Log In</button>

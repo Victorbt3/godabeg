@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Functions</title>
+</head>
+<body>
+    <h1>Testing Functions</h1>
+    <div id="status"></div>
+    <button onclick="testFunctions()">Test All Functions</button>
+    
+    <script src="js/app.js"></script>
+    <script>
+        function testFunctions() {
+            const status = document.getElementById('status');
+            let results = '<h2>Function Test Results:</h2>';
+            
+            // Test if functions exist
+            results += '<p>createAccount: ' + (typeof window.createAccount === 'function' ? '✅ Loaded' : '❌ Missing') + '</p>';
+            results += '<p>loginUser: ' + (typeof window.loginUser === 'function' ? '✅ Loaded' : '❌ Missing') + '</p>';
+            results += '<p>logout: ' + (typeof window.logout === 'function' ? '✅ Loaded' : '❌ Missing') + '</p>';
+            
+            // Test querySelector
+            const testDiv = document.createElement('div');
+            testDiv.innerHTML = '<input placeholder="Test Input">';
+            document.body.appendChild(testDiv);
+            const testInput = document.querySelector('input[placeholder="Test Input"]');
+            results += '<p>querySelector: ' + (testInput ? '✅ Works' : '❌ Failed') + '</p>';
+            document.body.removeChild(testDiv);
+            
+            status.innerHTML = results;
+        }
+        
+        // Auto-run test on load
+        window.addEventListener('load', testFunctions);
+    </script>
+</body>
+</html>
